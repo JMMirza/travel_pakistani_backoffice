@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class AlterFieldBirthdayToSiteUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('cuisines', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('site_users', function (Blueprint $table) {
+            $table->date("birthday")->nullable()->change();
         });
     }
 
@@ -26,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cuisines');
+        Schema::table('site_users', function (Blueprint $table) {
+            $table->date("birthday")->change();
+        });
     }
-};
+}

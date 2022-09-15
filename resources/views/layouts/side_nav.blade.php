@@ -38,11 +38,11 @@
                         <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Dashboard</span>
                     </a>
                 </li>
-
-
-
-
-
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="{{ route('landmarks.index') }}" role="button">
+                        <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Landmarks</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
