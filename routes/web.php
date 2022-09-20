@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\LandmarkController;
+use App\Http\Controllers\Admin\OperatorController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,13 +15,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Auth::routes(['verify' => true]);
 
-Auth::routes();
+Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    } else {
+        return view('auth.login');
+    }
+})->name('index');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::group(['middleware' => ['auth']], function () {
     Route::resources(['/landmarks' => LandmarkController::class]);
+    Route::resources(['/operators' => OperatorController::class]);
 });

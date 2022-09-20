@@ -61,7 +61,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6 col-sm-12">
+                        <div class="col-md-4 col-sm-12">
                             <div class="form-label-group in-border">
                                 <label for="phone" class="form-label">Phone Number</label>
                                 <input type="number"
@@ -78,7 +78,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6 col-sm-12">
+                        <div class="col-md-4 col-sm-12 mb-3">
                             <div class="form-label-group in-border">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="number"
@@ -95,7 +95,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6 col-sm-12">
+                        <div class="col-md-4 col-sm-12">
                             <div class="form-label-group in-border">
                                 <label for="website" class="form-label">Website</label>
                                 <input type="text"
@@ -128,7 +128,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 col-sm-12">
+                        <div class="col-md-4 col-sm-12 mb-3">
                             <div class="form-label-group in-border">
                                 <label for="long" class="form-label">Longitude</label>
                                 <input type="decimal" step="0.00001"
@@ -187,7 +187,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 col-sm-12">
+                        <div class="col-md-4 col-sm-12 mb-3">
                             <div class="form-label-group in-border">
                                 <label for="subCategories" class="form-label">Sub Category</label>
                                 <input type=text class="form-control @if ($errors->has('subCategories')) is-invalid @endif"
@@ -235,7 +235,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 col-sm-12">
+                        <div class="col-md-4 col-sm-12 mb-3">
                             <div class="form-label-group in-border">
                                 <label for="bestTimeToVisit" class="form-label">Best Time to Visit</label>
                                 <input type=text class="form-control @if ($errors->has('bestTimeToVisit')) is-invalid @endif"
@@ -285,7 +285,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 col-sm-12">
+                        <div class="col-md-4 col-sm-12 mb-3">
                             <div class="form-label-group in-border">
                                 <label for="seating" class="form-label">Seating</label>
                                 <input type=text class="form-control @if ($errors->has('seating')) is-invalid @endif"
@@ -382,7 +382,7 @@
             <div class="modal-content animated flipInUp">
                 <div class="modal-body">
                     <div class="text-center">
-                        <img class="d-block w-100" src="{{ $product->product_picture_url }}" alt="domicile">
+                        <img class="d-block w-100" src="{{ $landmark->image }}" alt="domicile">
                     </div>
                 </div>
                 <div class="modal-footer">
