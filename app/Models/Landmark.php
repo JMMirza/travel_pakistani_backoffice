@@ -6,6 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Landmark extends Model
 {
+    protected $dates = [
+
+        'created_at',
+        'updated_at',
+    ];
+
+    protected $casts = [
+        'created_at' => 'date:d M, Y H:i',
+    ];
     protected $primaryKey = 'id';
     public function landmarkContent()
     {

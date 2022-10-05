@@ -81,7 +81,7 @@
                         <div class="col-md-4 col-sm-12 mb-3">
                             <div class="form-label-group in-border">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="number"
+                                <input type="email"
                                     class="form-control @if ($errors->has('email')) is-invalid @endif" id="email"
                                     name="email" placeholder="Please enter Email" value="{{ $landmark->email }}">
 

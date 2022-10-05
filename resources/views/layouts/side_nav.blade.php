@@ -43,6 +43,49 @@
                         <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Landmarks</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="{{ route('inquiries.index') }}" role="button">
+                        <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Inquiry</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="{{ route('cities.index') }}" role="button">
+                        <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">City</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="{{ route('hotels.index') }}" role="button">
+                        <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Hotels</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarRolePermission" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="sidebarRolePermission">
+                        <i class="ri-dashboard-2-line"></i>
+                        <span data-key="t-dashboards">Roles & Permissions</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarRolePermission">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ route('staffs.index') }}" class="nav-link" data-key="t-analytics">
+                                    Staffs
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('roles-permission-assignment-list') }}" class="nav-link"
+                                    data-key="t-analytics"> Roles Assignment </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('roles.index') }}" class="nav-link" data-key="t-analytics"> Roles
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('permissions.index') }}" class="nav-link" data-key="t-analytics">
+                                    Permissions </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
             </ul>
         </div>
     </div>

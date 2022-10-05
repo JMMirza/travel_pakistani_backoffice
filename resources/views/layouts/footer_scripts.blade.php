@@ -37,6 +37,7 @@
         allowClear: true
     });
 
+
     $(document).on('click', '.delete-record', function(e) {
         e.preventDefault();
 
@@ -127,5 +128,15 @@
             type: 'html',
             targetStyles: ['*'],
         })
+    });
+
+    $(document).ready(function() {
+        $('.select2').select2({
+            maximumSelectionLength: 2,
+            dropdownAutoWidth: true,
+            width: '100%',
+            placeholder: "Select please",
+            allowClear: false
+        });
     });
 </script>

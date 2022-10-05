@@ -11,6 +11,16 @@ class Inquiry extends Model
 {
     use SoftDeletes;
     //protected $appends = ['planned_cities'];
+    protected $dates = [
+
+        'created_at',
+        'updated_at',
+    ];
+
+    protected $casts = [
+        'created_at' => 'date:d M, Y H:i',
+    ];
+
     public function city()
     {
         return $this->hasOne(City::class, 'city_id', 'cityId');

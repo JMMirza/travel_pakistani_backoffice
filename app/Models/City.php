@@ -2,13 +2,28 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class City extends Model
 {
-    protected $connection = 'mysql2';
-    protected $table = 'city';
-    protected $primaryKey = 'city_id';
+    use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'abbreviation'
+    ];
+
+    protected $dates = [
+
+        'created_at',
+        'updated_at',
+    ];
+
+    protected $casts = [
+        'created_at' => 'date:d M, Y H:i',
+    ];
+
     public function orders()
     {
         return $this->hasMany(QuotationOrder::class, 'cityId');
