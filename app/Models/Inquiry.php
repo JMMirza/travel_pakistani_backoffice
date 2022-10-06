@@ -11,6 +11,7 @@ class Inquiry extends Model
 {
     use SoftDeletes;
     //protected $appends = ['planned_cities'];
+    protected $guarded = [];
     protected $dates = [
 
         'created_at',

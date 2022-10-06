@@ -48,11 +48,11 @@
                         <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Inquiry</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link menu-link" href="{{ route('cities.index') }}" role="button">
                         <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">City</span>
                     </a>
-                </li>
+                </li> --}}
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="{{ route('hotels.index') }}" role="button">
                         <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Hotels</span>

@@ -15,8 +15,24 @@ return new class extends Migration
     {
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('abbreviation')->nullable();
+            $table->string('city_code')->nullable();
+            $table->string('title');
+            $table->unsignedBigInteger('fk_branch_id')->nullable();
+            $table->string('slug')->nullable();
+            $table->text('description')->nullable();
+            $table->tinyInteger('sort_order')->nullable();
+            $table->string('is_active')->nullable();
+            $table->string('is_deleted')->nullable();
+            $table->text('meta_title')->nullable();
+            $table->text('meta_keyword')->nullable();
+            $table->dateTime('dated')->nullable();
+            $table->dateTime('last_updated')->nullable();
+            $table->string('city_emergency_number')->nullable();
+            $table->text('city_introduction')->nullable();
+            $table->string('city_image')->nullable();
+            $table->tinyInteger('show_in_app')->nullable();
+            $table->decimal('city_lat')->nullable();
+            $table->decimal('city_long')->nullable();
             $table->timestamps();
         });
     }

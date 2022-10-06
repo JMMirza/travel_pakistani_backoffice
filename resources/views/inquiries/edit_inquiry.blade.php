@@ -78,18 +78,12 @@
                                         selected disabled>
                                         Select One
                                     </option>
-                                    <option value="" @if ($inquiry->cityId == '1') {{ 'selected' }} @endif>
-                                        Lahore
-                                    </option>
-                                    <option value="" @if ($inquiry->cityId == '2') {{ 'selected' }} @endif>
-                                        Karachi
-                                    </option>
-                                    {{-- @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}"
-                                            @if ($inquiry->cityId == $category->id) {{ 'selected' }} @endif>
-                                            {{ $category->name }}
+                                    @foreach ($cities as $city)
+                                        <option value="{{ $city->id }}"
+                                            @if ($inquiry->cityId == $city->id) {{ 'selected' }} @endif>
+                                            {{ $city->name }}
                                         </option>
-                                    @endforeach --}}
+                                    @endforeach
                                 </select>
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('cityId'))
