@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\ItineraryTemplate;
 use Illuminate\Http\Request;
 use DataTables;
@@ -18,6 +19,7 @@ class ItineraryController extends Controller
     public function index(Request $request)
     {
         $user = \Auth::user();
+        $categories = Category::all();
         if ($request->ajax()) {
 
             $data = ItineraryTemplate::where('userId', $user->id)->with("category")->latest()->get();
@@ -26,24 +28,20 @@ class ItineraryController extends Controller
                 // ->addColumn('preferredDate', function ($row) {
                 //     return $row->tourFrom . '-' . $row->tourEnd;
                 // })
-                // ->addColumn('status', function ($row) {
-                //     if ($row->status == 'Expired') {
-                //         return '<span class="badge bg-danger">Expired</span>';
-                //     } elseif ($row->status == 'In Process') {
-                //         return '<span class="badge bg-primary">Pending</span>';
-                //     } elseif ($row->status == 'Confirm') {
-                //         return '<span class="badge bg-default">Complete</span>';
-                //     } else {
-                //         return '<span class="badge bg-warning">New</span>';
-                //     }
-                // })
+                ->addColumn('status', function ($row) {
+                    if ($row->status == '0') {
+                        return '<span class="badge bg-danger">In Active</span>';
+                    } else {
+                        return '<span class="badge bg-primary">Active</span>';
+                    }
+                })
                 ->addColumn('action', function ($row) {
                     return view('itinerary_templates.actions', ['row' => $row]);
                 })
-                ->rawColumns(['action', 'description'])
+                ->rawColumns(['action', 'status'])
                 ->make(true);
         }
-        return view('itinerary_templates.itinerary_templates');
+        return view('itinerary_templates.itinerary_templates', ['categories' => $categories]);
     }
 
     /**
@@ -103,7 +101,8 @@ class ItineraryController extends Controller
     public function edit($id)
     {
         $itinerary_template = ItineraryTemplate::find($id);
-        return view('itinerary_templates.itinerary_templates', ['itinerary_template' => $itinerary_template]);
+        $categories = Category::all();
+        return view('itinerary_templates.itinerary_templates', ['itinerary_template' => $itinerary_template, 'categories' => $categories]);
     }
 
     /**

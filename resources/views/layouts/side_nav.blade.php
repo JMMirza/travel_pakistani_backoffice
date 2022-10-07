@@ -54,6 +54,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link menu-link" href="{{ route('itinerary-templates.index') }}" role="button">
+                        <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Itinerary Templates</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link menu-link" href="{{ route('hotels.index') }}" role="button">
                         <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Hotels</span>
                     </a>

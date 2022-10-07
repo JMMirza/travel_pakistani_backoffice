@@ -80,7 +80,7 @@
 
                 <div class="col-12 text-end">
                     <button id="submit_btn" class="btn btn-primary" type="submit">Save Changes</button>
-                    <a href="{{ route('landmarks.index') }}" type="button"
+                    <a href="{{ route('templates.index') }}" type="button"
                         class="btn btn-light bg-gradient waves-effect waves-light">Cancel</a>
                 </div>
             </form>
