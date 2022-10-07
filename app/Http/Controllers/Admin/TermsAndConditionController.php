@@ -19,7 +19,7 @@ class TermsAndConditionController extends Controller
     {
         if ($request->ajax()) {
 
-            $data = CustomTemplate::where('userId', Auth::user()->id)->latest()->get();
+            $data = CustomTemplate::where('userId', \Auth::user()->id)->with('user')->latest()->get();
             return Datatables::of($data)
                 ->addIndexColumn()
                 // ->addColumn('preferredDate', function ($row) {
@@ -39,7 +39,7 @@ class TermsAndConditionController extends Controller
                 ->addColumn('action', function ($row) {
                     return view('custom_templates.actions', ['row' => $row]);
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['action', 'description'])
                 ->make(true);
         }
         return view('custom_templates.custom_templates');

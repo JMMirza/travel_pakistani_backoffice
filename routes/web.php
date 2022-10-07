@@ -4,10 +4,12 @@ use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\CommonController;
 use App\Http\Controllers\Admin\HotelController;
 use App\Http\Controllers\Admin\InquiryController;
+use App\Http\Controllers\Admin\ItineraryController;
 use App\Http\Controllers\Admin\LandmarkController;
 use App\Http\Controllers\Admin\OperatorController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\TermsAndConditionController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +41,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resources(['/inquiries' => InquiryController::class]);
     Route::resources(['/cities' => CityController::class]);
     Route::resources(['/hotels' => HotelController::class]);
+    Route::resources(['/templates' => TermsAndConditionController::class]);
+    Route::resources(['/itinerary-templates' => ItineraryController::class]);
 
     Route::resources(['roles' => RoleController::class]);
     Route::resources(['permissions' => PermissionController::class]);

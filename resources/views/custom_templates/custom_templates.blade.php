@@ -15,7 +15,7 @@
                 <h4 class="card-title mb-0 flex-grow-1">Custom Template</h4>
                 {{-- @permission('add-course') --}}
                 <div class="flex-shrink-0">
-                    <a href="{{ route('landmarks.create') }}" class="btn btn-success btn-label btn-sm">
+                    <a href="{{ route('templates.create') }}" class="btn btn-success btn-label btn-sm">
                         <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Add New
                     </a>
                 </div>
@@ -23,13 +23,14 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    <table id="landmarks-data-table"
+                    <table id="templates-data-table"
                         class="table table-bordered table-striped align-middle table-nowrap mb-0" style="width:100%">
                         <thead>
                             <tr>
-                                <th></th>
-                                <th>Name</th>
-                                <th>Category</th>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>User Name</th>
+                                <th>Type</th>
                                 <th>Created At</th>
                                 <th>Action</th>
                             </tr>
@@ -40,7 +41,7 @@
             </div>
         </div>
     </div>
-    <input id="ajaxRoute" value="{{ route('landmarks.index') }}" hidden />
+    <input id="ajaxRoute" value="{{ route('templates.index') }}" hidden />
 @endsection
 
 
@@ -48,6 +49,6 @@
 @endpush
 
 @push('footer_scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script type="text/javascript" src="{{ asset('modules/landmarks.js') }}"></script>
+    <script src="{{ asset('theme/dist/default/assets/js/pages/form-input-spin.init.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('modules/templates.js') }}"></script>
 @endpush
