@@ -46,4 +46,9 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function city()
+    {
+        return $this->hasOne(City::class, 'city_id', 'cityId');
+    }
 }

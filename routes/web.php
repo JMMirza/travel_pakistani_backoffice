@@ -43,6 +43,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resources(['/hotels' => HotelController::class]);
     Route::resources(['/templates' => TermsAndConditionController::class]);
     Route::resources(['/itinerary-templates' => ItineraryController::class]);
+    Route::get('profile', [CommonController::class, 'profile'])->name('profile');
 
     Route::resources(['roles' => RoleController::class]);
     Route::resources(['permissions' => PermissionController::class]);
