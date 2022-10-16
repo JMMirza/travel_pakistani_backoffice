@@ -4,6 +4,7 @@
 <script src="{{ asset('theme/dist/default/assets/libs/node-waves/waves.min.js') }}"></script>
 <script src="{{ asset('theme/dist/default/assets/libs/feather-icons/feather.min.js') }}"></script>
 <script src="{{ asset('theme/dist/default/assets/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
+<script src="{{ asset('theme/dist/default/assets/libs/aos/aos.js') }}"></script>
 <script src="{{ asset('theme/dist/default/assets/js/plugins.js') }}"></script>
 
 <script src="{{ asset('theme/dist/default/assets/libs/prismjs/prism.js') }}"></script>
@@ -90,6 +91,8 @@
 
     $(document).on('click', '.show-modal', function(e) {
 
+        e.preventDefault();
+
         var target = $(this).data('target');
         var url = $(this).data('url');
         console.log('show modal', target, url);
@@ -119,7 +122,6 @@
         });
     });
 
-
     $(document).on('click', '.print-content', function(e) {
         var content = $(this).data('content')
         // printJS(content, 'html')
@@ -132,11 +134,145 @@
 
     $(document).ready(function() {
         $('.select2').select2({
-            maximumSelectionLength: 2,
+            // maximumSelectionLength: 2,
             dropdownAutoWidth: true,
             width: '100%',
-            placeholder: "Select please",
-            allowClear: false
+            // placeholder: "Select please",
+            allowClear: true
         });
     });
+
+    $(document).on('click', '.add-existing-itinerary', function(e) {
+
+        e.preventDefault();
+
+        var itinerary_detail_id = $(this).data('itinerary_detail_id');
+        var target = $(this).data('target');
+
+        var quotation_id = $('#quotationId').val();
+        var url = "{{ route('add-quotation-itinerary') }}";
+
+        $.ajax({
+
+            url: url,
+            type: "POST",
+            data: {
+                itinerary_detail_id: itinerary_detail_id,
+                quotation_id: quotation_id
+            },
+            // dataType: 'html',
+            headers: {
+                'X-CSRF-Token': '{{ csrf_token() }}',
+            },
+            cache: false,
+            success: function(data) {
+                console.log(data, target);
+                $(target).remove();
+            },
+            error: function() {
+
+            },
+            beforeSend: function() {
+
+            },
+            complete: function() {
+
+            }
+        });
+    });
+
+    $(document).on('click', '.remove-quotation-itinerary', function(e) {
+
+        e.preventDefault();
+
+        var quotation_itinerary_id = $(this).data('quotation_itinerary_id');
+        var target = $(this).data('target');
+
+        var quotation_id = $('#quotationId').val();
+        var url = $(this).attr('href');
+
+        $.ajax({
+
+            url: url,
+            type: "DELETE",
+            // dataType: 'html',
+            headers: {
+                'X-CSRF-Token': '{{ csrf_token() }}',
+            },
+            cache: false,
+            success: function(data) {
+                console.log(data, target);
+                $(target).remove();
+                // Swal.fire({
+                //     position: "top-end",
+                //     icon: "warning",
+                //     title: "Removed successfully.",
+                //     showConfirmButton: !1,
+                //     timer: 1500,
+                //     showCloseButton: !0
+                // })
+            },
+            error: function() {
+
+            },
+            beforeSend: function() {
+
+            },
+            complete: function() {
+
+            }
+        });
+    });
+
+    $(document).on('change', '.landmark-filters', function(e) {
+        var landmarkType = $('#landmarkTypes').val();
+        var itineraryCity = $('#itineraryCities').val();
+        listLandmarks(landmarkType, itineraryCity);
+    });
+
+    function listLandmarks(type, city) {
+
+        $.ajax({
+            url: `/landmarks/suggestions/${ city }/${ type }`,
+            type: "GET",
+            headers: {
+                'X-CSRF-Token': '{{ csrf_token() }}',
+            },
+            cache: false,
+            success: function(resp) {
+
+                var options = '';
+
+                $.each(resp.data, function(index, val) {
+                    console.log(index, val);
+                    options += `<option value="${ val.id }">${ val.title }</option>`;
+                });
+
+                console.log(resp.data, 'options', options);
+
+                $('#landmarkList').html(options);
+            },
+            error: function() {
+
+            },
+            beforeSend: function() {
+
+            },
+            complete: function() {
+
+            }
+        });
+    }
+
+    function showToast(msg) {
+        var toastBody = $('#toastBody');
+        toastBody.toast('show')
+
+    }
+
+    function showDetailsModal(content) {
+        $('#detailsModal #detailsModalLabel').html(content.title);
+        $('#detailsModal .modal-body').html(content.description);
+        $('#detailsModal').modal('show');
+    }
 </script>

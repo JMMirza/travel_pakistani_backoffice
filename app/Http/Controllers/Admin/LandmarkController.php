@@ -149,4 +149,12 @@ class LandmarkController extends Controller
             print_r($e->errorInfo);
         }
     }
+
+    public function landmarkSuggestions(Request $request)
+    {
+        $city = $request->city;
+        $type = $request->type;
+        $landmarks = Landmark::where("cityId",$city)->where("categoryId",$type)->with("images")->get();
+        return response()->json(['data'=>$landmarks]);
+    }  
 }

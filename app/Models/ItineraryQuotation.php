@@ -4,16 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Admin\Landmark;
+use App\Models\Landmark;
 
 class ItineraryQuotation extends Model
 {
     use SoftDeletes;
     protected $appends = ["itineraryLandmarks"];
+
     public function quotationable()
     {
         return $this->morphTo();
     }
+
     public function getItineraryLandmarksAttribute()
     {
         $landmarksAll = array();
