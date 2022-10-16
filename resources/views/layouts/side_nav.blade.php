@@ -59,6 +59,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link menu-link" href="{{ route('operators.index') }}" role="button">
+                        <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">View Operators</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link menu-link" href="{{ route('hotels.index') }}" role="button">
                         <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Hotels</span>
                     </a>

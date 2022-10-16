@@ -47,8 +47,68 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+    public function userable()
+    {
+        return $this->morphTo();
+    }
+
+    public function user()
+    {
+        return $this->morphOne(Self::class, 'userable');
+    }
+
+    public function staff()
+    {
+        return $this->morphOne(Staff::class, 'staffable');
+    }
+
+    public function reportingStaff()
+    {
+        return $this->hasMany(Staff::class, 'reportsTo');
+    }
+
+    public function tours()
+    {
+        return $this->hasMany(Tour::class, "userId");
+    }
+
+    public function quotations()
+    {
+        return $this->hasMany(Quotation::class, 'userId');
+    }
+
+    public function inquiries()
+    {
+        return $this->hasMany(Inquiry::class, 'assignedTo');
+    }
+
+    public function createdInquiries()
+    {
+        return $this->hasMany(Inquiry::class, 'createdBy');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, "branchId");
+    }
+
+    public function messages()
+    {
+        return $this->morphMany(Message::class, 'messageable');
+    }
+
+    public function banks()
+    {
+        return $this->hasMany(BanksDetail::class, "userId");
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(QuotationOrder::class, "userId");
+    }
+
     public function city()
     {
-        return $this->hasOne(City::class, 'city_id', 'cityId');
+        return $this->belongsTo(City::class, "cityId", 'city_id');
     }
 }

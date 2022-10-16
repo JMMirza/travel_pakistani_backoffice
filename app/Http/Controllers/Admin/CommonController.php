@@ -28,6 +28,7 @@ class CommonController extends Controller
     {
         $cities = City::all();
         $bank_details = BanksDetail::where('userId', \Auth::user()->id)->get();
+        // dd($bank_details->toArray());
         return view('profile.index', ['cities' => $cities, 'bank_details' => $bank_details]);
     }
 }

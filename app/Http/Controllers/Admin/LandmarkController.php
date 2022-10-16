@@ -32,7 +32,7 @@ class LandmarkController extends Controller
                 ->addColumn('action', function ($row) {
                     return view('landmarks.actions', ['row' => $row]);
                 })
-                ->rawColumns(['action', 'parent_id'])
+                ->rawColumns(['action'])
                 ->make(true);
         }
         return view('landmarks.landmarks');
