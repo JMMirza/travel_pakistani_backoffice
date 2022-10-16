@@ -24,12 +24,19 @@ class ItineraryTemplate extends Model
     {
         return $this->belongsTo(User::class, "userId");
     }
+
     public function category()
     {
         return $this->belongsTo(Category::class, "categoryId");
     }
+
     public function city()
     {
         return $this->belongsTo(City::class, "cityId");
+    }
+
+    public function templateDetails()
+    {
+        return $this->hasMany(ItineraryTemplateDetail::class, 'templateId', 'id');
     }
 }
