@@ -78,18 +78,12 @@
                                         selected disabled>
                                         Select One
                                     </option>
-                                    <option value="" @if (old('cityId') == '1') {{ 'selected' }} @endif>
-                                        Lahore
-                                    </option>
-                                    <option value="" @if (old('cityId') == '2') {{ 'selected' }} @endif>
-                                        Karachi
-                                    </option>
-                                    {{-- @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}"
-                                            @if (old('cityId') == $category->id) {{ 'selected' }} @endif>
-                                            {{ $category->name }}
+                                    @foreach ($cities as $city)
+                                        <option value="{{ $city->city_id }}"
+                                            @if (old('cityId') == $city->city_id) {{ 'selected' }} @endif>
+                                            {{ $city->title }}
                                         </option>
-                                    @endforeach --}}
+                                    @endforeach
                                 </select>
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('cityId'))
@@ -151,7 +145,12 @@
                                 <select class="form-select @if ($errors->has('cities')) is-invalid @endif select2"
                                     id="cities" name="cities[]" multiple>
                                     <option value="">Please select</option>
-
+                                    @foreach ($cities as $city)
+                                        <option value="{{ $city->city_id }}"
+                                            @if (old('cityId') == $city->city_id) {{ 'selected' }} @endif>
+                                            {{ $city->title }}
+                                        </option>
+                                    @endforeach
                                 </select>
                                 <div class="invalid-tooltip">Cities is required!</div>
                             </div>
