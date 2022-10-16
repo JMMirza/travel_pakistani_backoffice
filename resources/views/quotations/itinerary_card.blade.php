@@ -5,7 +5,7 @@
             <div>
                 <h5 class="mt-0">{{ $itinerary->title }}</h5>
                 <p>{{ $itinerary->details }}</p>
-                <a href="{{ route('add-quotation-itinerary-modal') }}?id={{ $itinerary->id }}" data-url="{{ route('add-quotation-itinerary-modal') }}?id={{ $itinerary->id }}" class="btn btn-primary btn-label btn-sm show-modal-itinerary" data-target="#quotationItineraryModal">
+                <a href="{{ route('add-quotation-itinerary-modal', ['id' => $itinerary->id, 'quotationId' => $itinerary->quotationable_id]) }}" data-url="{{ route('add-quotation-itinerary-modal', ['id' => $itinerary->id, 'quotationId' => $itinerary->quotationable_id]) }}" class="btn btn-primary btn-label btn-sm show-modal-itinerary" data-target="#quotationItineraryModal">
                     <i class="ri-pencil-line label-icon align-middle fs-16 me-2"></i> Edit
                 </a>
                 <a href="{{ route('remove-quotation-itinerary', $itinerary->id) }}" data-quotation_itinerary_id="{{ $itinerary->id }}" data-target="#quotation-itinerary-{{ $itinerary->id }}" class="btn btn-danger btn-label btn-sm  remove-quotation-itinerary">

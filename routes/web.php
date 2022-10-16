@@ -77,6 +77,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/add-quotation-policies-modal', [QuotationController::class, 'addQuotationPoliciesModal'])->name('add-quotation-policies-modal');
 
     // Route::get('/add-quotation-itinerary-modal', [QuotationController::class, 'addQuotationItineraryModal'])->name('add-quotation-itinerary-modal');
+    Route::post('/save-quotation-itinerary', [QuotationController::class, 'saveQuotationItinerary'])->name('save-quotation-itinerary');
+    Route::post('/save-quotation-hotel', [QuotationController::class, 'saveQuotationHotel'])->name('save-quotation-hotel');
     Route::post('/save-quotation-hotel', [QuotationController::class, 'saveQuotationHotel'])->name('save-quotation-hotel');
     Route::post('/save-quotation-meal', [QuotationController::class, 'saveQuotationMeal'])->name('save-quotation-meal');
     Route::post('/save-quotation-transport', [QuotationController::class, 'saveQuotationTransport'])->name('save-quotation-transport');

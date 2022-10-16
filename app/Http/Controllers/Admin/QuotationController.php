@@ -202,6 +202,8 @@ class QuotationController extends Controller
     {
         $itineraryQuotation = null;
 
+        $quotationId = $request->input('quotationId', 0);
+
         if ($request->id) {
             $itineraryQuotation = ItineraryQuotation::find($request->id);
         }
@@ -228,6 +230,7 @@ class QuotationController extends Controller
             'days' => $days,
             'cities' => $cities,
             'landmarkCategories' => $landmarkCategories,
+            'quotationId' => $quotationId
         ]);
     }
 
@@ -366,6 +369,40 @@ class QuotationController extends Controller
             'noteType' => $noteType,
             'noteTypes' => $noteTypes,
         ]);
+    }
+
+    public function saveQuotationItinerary(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'quotationId' => 'required',
+            'itineraryQuotationId' => 'required',
+            'itineraryDay' => 'required',
+            'title' => 'required',
+            'itineraryDescription' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()->all()]);
+        }
+
+        $quotationId = $request->input('quotationId', 0);
+        $itineraryQuotationId = $request->input('itineraryQuotationId', 0);
+
+        if ($itineraryQuotationId > 0) {
+            $quotationItinerary = ItineraryQuotation::find($itineraryQuotationId);
+
+            $quotationItinerary->day = $request->itineraryDay;
+            $quotationItinerary->title = $request->title;
+            $quotationItinerary->details = $request->itineraryDescription;
+        } else {
+            $quotationItinerary = new ItineraryQuotation();
+
+            $quotationItinerary->day = $request->itineraryDay;
+            $quotationItinerary->title = $request->title;
+            $quotationItinerary->details = $request->itineraryDescription;
+        }
+
+        $quotationItinerary->save();
     }
 
     public function saveQuotationHotel(Request $request)
