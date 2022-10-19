@@ -1,5 +1,10 @@
 @extends('layouts.master')
 
+@push('header_scripts')
+    <link href="{{ asset('theme/dist/default/assets/libs/quill/quill.core.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('theme/dist/default/assets/libs/quill/quill.snow.css') }}" rel="stylesheet" type="text/css" />
+@endpush
+
 @section('content')
     <div class="position-relative mx-n4 mt-n4">
         <div class="profile-wid-bg profile-setting-img">
@@ -102,8 +107,11 @@
                 <div class="card-body p-4">
                     <div class="tab-content">
                         <div class="tab-pane active" id="personalDetails" role="tabpanel">
-                            <form action="javascript:void(0);">
+                            <form id="shareholderForm" action="{{ route('update-profile', Auth::user()->id) }}"
+                                method="POST">
+                                @csrf
                                 <div class="row">
+                                    <input type="text" name="request_type" value="personal_info" hidden>
                                     <div class="col-lg-4">
                                         <div class="form-label-group in-border mb-3">
                                             <label for="username" class="form-label">User
@@ -129,7 +137,7 @@
                                             <input type="text"
                                                 class="form-control @if ($errors->has('name')) is-invalid @endif"
                                                 id="name" name="name" placeholder="Please Enter"
-                                                value="{{ Auth::user()->username }}">
+                                                value="{{ Auth::user()->name }}">
                                             <div class="invalid-tooltip">
                                                 @if ($errors->has('name'))
                                                     {{ $errors->first('name') }}
@@ -212,8 +220,11 @@
                             </form>
                         </div>
                         <div class="tab-pane" id="changePassword" role="tabpanel">
-                            <form action="javascript:void(0);">
+                            <form id="shareholderForm" action="{{ route('update-profile', Auth::user()->id) }}"
+                                method="POST">
+                                @csrf
                                 <div class="row g-2">
+                                    <input type="text" name="request_type" value="change_password" hidden>
                                     <div class="col-lg-4">
                                         <div>
                                             <label for="oldpasswordInput" class="form-label">Old
@@ -323,10 +334,11 @@
                                 <h4 class="card-title mb-0 flex-grow-1">Bank Details</h4>
                                 {{-- @permission('add-course') --}}
                                 <div class="flex-shrink-0">
-                                    <a href="{{ route('itinerary-templates.create') }}"
-                                        class="btn btn-success btn-label btn-sm">
-                                        <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Add New
-                                    </a>
+                                    <button type="button" class="btn btn-success btn-label btn-sm showModal"
+                                        data-url="{{ route('open-bank-modal') }}" data-bs-toggle="modal"
+                                        id="shareholders" data-target="#shareholderModel"><i
+                                            class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Add New</button>
+
                                 </div>
                                 {{-- @endpermission --}}
                             </div>
@@ -351,9 +363,15 @@
                                                         <td>{{ $bank_detail->accountNo }}
                                                         </td>
                                                         <td>{{ $bank_detail->accountTitle }}</td>
-                                                        <td><a href=""
-                                                                class="btn btn-sm btn-success btn-icon waves-effect waves-light">
-                                                                <i class="mdi mdi-lead-pencil"></i>
+                                                        <td>
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-success btn-icon waves-effect waves-light showModal"
+                                                                data-url="{{ route('edit-bank-modal', $bank_detail->id) }}"
+                                                                data-bs-toggle="modal" id="shareholders"
+                                                                data-target="#shareholderModel"> <i
+                                                                    class="mdi mdi-lead-pencil"></i></button>
+                                                            <a href="" class="">
+
                                                             </a>
                                                             <a href="" data-table="payment-mode-data-table"
                                                                 class="btn btn-sm btn-danger btn-icon waves-effect waves-light delete-record">
@@ -373,21 +391,16 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="business_info" role="tabpanel">
-                            <div class="card-header align-items-center d-flex">
-                                <h4 class="card-title mb-0 flex-grow-1">Bank Details</h4>
-                                {{-- @permission('add-course') --}}
-                                <div class="flex-shrink-0">
-                                    <a href="{{ route('itinerary-templates.create') }}"
-                                        class="btn btn-success btn-label btn-sm">
-                                        <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Add New
-                                    </a>
-                                </div>
-                                {{-- @endpermission --}}
-                            </div>
                             <div class="card">
+                                <div class="card-header align-items-center d-flex">
+                                    <h4 class="card-title mb-0 flex-grow-1">Business Information</h4>
+                                </div>
                                 <div class="card-body">
-                                    <form action="javascript:void(0);">
+                                    <form id="shareholderForm" action="{{ route('update-profile', Auth::user()->id) }}"
+                                        method="POST">
+                                        @csrf
                                         <div class="row">
+                                            <input type="text" name="request_type" value="bussiness_info" hidden>
                                             <div class="col-lg-4">
                                                 <div class="form-label-group in-border mb-3">
                                                     <label for="companyTitle" class="form-label">Company Title</label>
@@ -570,10 +583,6 @@
                                                 <div id="snow-editor" style="height: 300px;">{!! Auth::user()->about !!}</div>
                                                 <input type="hidden" name="about" id="about"
                                                     value="{{ Auth::user()->about }}">
-                                                {{-- <div class="form-label-group in-border">
-                                    <label for="description" class="form-label">Description (物品描述)</label>
-                                    <textarea class="form-control mb-3" name="description" id="description" placeholder="Enter product description here...">{{ $paymentMethod->description') }}</textarea>
-                                </div> --}}
                                             </div>
 
                                             <div class="col-lg-12">
@@ -600,4 +609,70 @@
 @endpush
 
 @push('footer_scripts')
+    <script src="{{ asset('theme/dist/default/assets/libs/quill/quill.min.js') }}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var quill_snow;
+            quill_snow = new Quill("#snow-editor", {
+                modules: {
+                    toolbar: [
+                        [{
+                            header: [1, 2, 3, 4, 5, 6, false]
+                        }],
+                        ["bold", "italic", "underline", "strike"],
+                        ["code-block"],
+                        ["link"],
+                        [{
+                            script: "sub"
+                        }, {
+                            script: "super"
+                        }],
+                        [{
+                            list: "ordered"
+                        }, {
+                            list: "bullet"
+                        }],
+                        ["clean"],
+                    ],
+                },
+                theme: "snow",
+            });
+            quill_snow.on("text-change", function(delta, oldDelta, source) {
+                $("#description").val(quill_snow.root.innerHTML);
+            });
+
+            $(document).on('click', '.showModal', function(e) {
+
+                e.preventDefault();
+
+                var target = $(this).data('target');
+                var url = $(this).data('url');
+                console.log('show modal', target, url);
+
+                $.ajax({
+
+                    url: url,
+                    type: "GET",
+                    // dataType: 'html',
+                    headers: {
+                        'X-CSRF-Token': '{{ csrf_token() }}',
+                    },
+                    cache: false,
+                    success: function(data) {
+                        $('#modal-div').html(data);
+                        $(target).modal('show');
+                    },
+                    error: function() {
+
+                    },
+                    beforeSend: function() {
+
+                    },
+                    complete: function() {
+
+                    }
+                });
+            });
+        });
+    </script>
 @endpush
