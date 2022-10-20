@@ -55,6 +55,7 @@ class Quotation extends Model
     protected $dates = [
         'tourFrom',
         'tourEnd',
+        'validity',
     ];
 
     protected $appends = ["quotation_versions"];

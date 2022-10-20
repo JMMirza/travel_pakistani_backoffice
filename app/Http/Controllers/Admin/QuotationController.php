@@ -177,7 +177,20 @@ class QuotationController extends Controller
             "freeText",
         ])->first();
 
-        // print_r(json_decode($quotation->requiredServices));
+        $totalCost = 0;
+        $finalAmount = 0;
+
+        if ($quotation->markupType == 'Total') {
+            $hotelCostSum = $quotation->hotelQuotations->sum('hotelCost');
+            $serviceCostSum = $quotation->serviceQuotations->sum('serviceCost');
+            $totalCost = $finalAmount = $hotelCostSum + $serviceCostSum;
+        }
+
+        if ($quotation->markupType == 'Individual') {
+            $hotelCostSum = $quotation->hotelQuotations->sum('hotelSales');
+            $serviceCostSum = $quotation->serviceQuotations->sum('serviceSales');
+            $totalCost = $finalAmount = $hotelCostSum + $serviceCostSum;
+        }
 
         return view('quotations.quotation_form', [
             'cities' => $cities,
@@ -185,7 +198,11 @@ class QuotationController extends Controller
             'quotation_id' => $quotation->id,
             'services' => json_decode($quotation->requiredServices),
             'userNotes' => json_decode($quotation->userNotes),
-            'tab' => isset($request->tab) ? $request->tab : 1
+            'tab' => isset($request->tab) ? $request->tab : 1,
+            'totalCost' => $totalCost,
+            'finalAmount' => $finalAmount,
+            'totalPersons' => ($quotation->adults + $quotation->children),
+
         ]);
     }
 
@@ -444,6 +461,7 @@ class QuotationController extends Controller
         $totalCost = $request->unitCost * $request->totalUnits * $request->nights;
         $hotel->hotelCost = $totalCost;
 
+        $totalSales = 0;
         $markupAmount = 0;
 
         if ($request->has("markupType") && $request->has("markupValue")) {
@@ -795,6 +813,32 @@ class QuotationController extends Controller
         $quotationNote->type = $request->noteType;
         $quotationNote->versionNo = $request->versionNo;
         $quotationNote->save();
+
+        $quotationNotes = QuotationNote::where(['quotationId' => $quotationId, 'type' => $request->noteType])->get();
+        return $this->noteRowsRender($quotationNotes, $request->serviceType);
+    }
+
+    public function saveQuotation(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'quotationId' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()->all()]);
+        }
+
+        dd($request->all());
+
+        $quotationId = $request->input('quotationId', 0);
+        $quotation = Quotation::find($quotationId);
+
+        $quotation->quotationId = $quotationId;
+        $quotation->title = $request->title;
+        $quotation->description = $request->description;
+        $quotation->type = $request->noteType;
+        $quotation->versionNo = $request->versionNo;
+        $quotation->save();
 
         $quotationNotes = QuotationNote::where(['quotationId' => $quotationId, 'type' => $request->noteType])->get();
         return $this->noteRowsRender($quotationNotes, $request->serviceType);
