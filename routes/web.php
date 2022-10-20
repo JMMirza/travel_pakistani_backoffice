@@ -48,6 +48,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resources(['/templates' => TermsAndConditionController::class]);
     Route::resources(['/itinerary-templates' => ItineraryController::class]);
     Route::get('profile', [CommonController::class, 'profile'])->name('profile');
+    Route::post('/update-profile/{id}', [UserController::class, 'update_user_profile'])->name('update-profile');
+    Route::get('/open-bank-modal', [UserController::class, 'open_bank_modal'])->name('open-bank-modal');
+    Route::post('/add-new-detail', [UserController::class, 'add_bank_details'])->name('add-new-detail');
+    Route::get('/edit-bank-modal/{id}', [UserController::class, 'edit_bank_detail'])->name('edit-bank-modal');
+    Route::post('/update-bank-detail/{id}', [UserController::class, 'update_bank_deatil'])->name('update-bank-detail');
 
     Route::resources(['roles' => RoleController::class]);
     Route::resources(['permissions' => PermissionController::class]);

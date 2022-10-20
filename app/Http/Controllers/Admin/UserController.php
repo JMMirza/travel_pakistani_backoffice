@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BanksDetail;
 use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\Permission;
@@ -22,6 +23,8 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 
 use DataTables;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -172,7 +175,6 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required | email | unique:users',
             'password' => 'required | min:8|confirmed',
-            'customer_type' => 'required|string|max:255'
         ]);
 
         $input = $request->all();
@@ -335,5 +337,89 @@ class UserController extends Controller
         } catch (QueryException $e) {
             print_r($e->errorInfo);
         }
+    }
+
+    public function update_user_profile(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        if ($request->request_type == 'personal_info') {
+            // dd($request->all());
+            $request->validate([
+                'name' => 'required',
+                'username' => 'required',
+                'phone' => 'required',
+                'email' => ['required', Rule::unique('users')->ignore($user->id)],
+                'cityId' => 'required',
+            ]);
+
+            $user->update([
+                'name' => $request->name,
+                'username' => $request->username,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'cityId' => $request->cityId,
+            ]);
+            // dd($request->all(), $user->toArray());
+        }
+        if ($request->request_type == 'change_password') {
+            $request->validate([
+                'oldPassword' => 'required',
+                'nPassword' => 'required|min:8|required_with:cPassword|same:cPassword'
+            ]);
+
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+        }
+        if ($request->request_type == 'bussiness_info') {
+        }
+
+        return redirect()->back()->with('success', 'User details updated successfully');
+    }
+
+    public function open_bank_modal()
+    {
+        // dd("hello");
+        return view('profile.bank_detail_modal');
+    }
+
+    public function add_bank_details(Request $request)
+    {
+        $request->validate([
+            'accountNo' => 'required',
+            'accountTitle' => 'required',
+            'bankName' => 'required',
+            'bankAddress' => 'required',
+            'bankPhone' => 'required',
+            'swiftCode' => 'required',
+            'IBAN' => 'required',
+        ]);
+
+        BanksDetail::create($request->all());
+        return redirect()->back()->with('success', 'Bank Detail entered');
+    }
+
+    public function edit_bank_detail($id)
+    {
+        $bank_detail = BanksDetail::findOrFail($id);
+        // dd($bank_detail->toArray());
+        return view('profile.bank_detail_modal', ['bank_detail' => $bank_detail]);
+    }
+
+    public function update_bank_details(Request $request, $id)
+    {
+        $bank_detail = BanksDetail::findOrFail($id);
+        $request->validate([
+            'accountNo' => 'required',
+            'accountTitle' => 'required',
+            'bankName' => 'required',
+            'bankAddress' => 'required',
+            'bankPhone' => 'required',
+            'swiftCode' => 'required',
+            'IBAN' => 'required',
+        ]);
+
+        $bank_detail->update($request->all());
+        return redirect()->back()->with('success', 'Bank Detail updated');
     }
 }

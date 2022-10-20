@@ -1,5 +1,10 @@
 @extends('layouts.master')
 
+@push('header_scripts')
+    <link href="{{ asset('theme/dist/default/assets/libs/quill/quill.core.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('theme/dist/default/assets/libs/quill/quill.snow.css') }}" rel="stylesheet" type="text/css" />
+@endpush
+
 @section('content')
     <div class="position-relative mx-n4 mt-n4">
         <div class="profile-wid-bg profile-setting-img">
@@ -91,14 +96,22 @@
                                 Payment Method
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#business_info" role="tab">
+                                <i class="far fa-envelope"></i>
+                                Business Information
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <div class="card-body p-4">
                     <div class="tab-content">
                         <div class="tab-pane active" id="personalDetails" role="tabpanel">
-                            <form action="javascript:void(0);">
+                            <form id="shareholderForm" action="{{ route('update-profile', Auth::user()->id) }}"
+                                method="POST">
+                                @csrf
                                 <div class="row">
+                                    <input type="text" name="request_type" value="personal_info" hidden>
                                     <div class="col-lg-4">
                                         <div class="form-label-group in-border mb-3">
                                             <label for="username" class="form-label">User
@@ -124,7 +137,7 @@
                                             <input type="text"
                                                 class="form-control @if ($errors->has('name')) is-invalid @endif"
                                                 id="name" name="name" placeholder="Please Enter"
-                                                value="{{ Auth::user()->username }}">
+                                                value="{{ Auth::user()->name }}">
                                             <div class="invalid-tooltip">
                                                 @if ($errors->has('name'))
                                                     {{ $errors->first('name') }}
@@ -207,8 +220,11 @@
                             </form>
                         </div>
                         <div class="tab-pane" id="changePassword" role="tabpanel">
-                            <form action="javascript:void(0);">
+                            <form id="shareholderForm" action="{{ route('update-profile', Auth::user()->id) }}"
+                                method="POST">
+                                @csrf
                                 <div class="row g-2">
+                                    <input type="text" name="request_type" value="change_password" hidden>
                                     <div class="col-lg-4">
                                         <div>
                                             <label for="oldpasswordInput" class="form-label">Old
@@ -318,10 +334,11 @@
                                 <h4 class="card-title mb-0 flex-grow-1">Bank Details</h4>
                                 {{-- @permission('add-course') --}}
                                 <div class="flex-shrink-0">
-                                    <a href="{{ route('itinerary-templates.create') }}"
-                                        class="btn btn-success btn-label btn-sm">
-                                        <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Add New
-                                    </a>
+                                    <button type="button" class="btn btn-success btn-label btn-sm showModal"
+                                        data-url="{{ route('open-bank-modal') }}" data-bs-toggle="modal"
+                                        id="shareholders" data-target="#shareholderModel"><i
+                                            class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Add New</button>
+
                                 </div>
                                 {{-- @endpermission --}}
                             </div>
@@ -346,9 +363,15 @@
                                                         <td>{{ $bank_detail->accountNo }}
                                                         </td>
                                                         <td>{{ $bank_detail->accountTitle }}</td>
-                                                        <td><a href=""
-                                                                class="btn btn-sm btn-success btn-icon waves-effect waves-light">
-                                                                <i class="mdi mdi-lead-pencil"></i>
+                                                        <td>
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-success btn-icon waves-effect waves-light showModal"
+                                                                data-url="{{ route('edit-bank-modal', $bank_detail->id) }}"
+                                                                data-bs-toggle="modal" id="shareholders"
+                                                                data-target="#shareholderModel"> <i
+                                                                    class="mdi mdi-lead-pencil"></i></button>
+                                                            <a href="" class="">
+
                                                             </a>
                                                             <a href="" data-table="payment-mode-data-table"
                                                                 class="btn btn-sm btn-danger btn-icon waves-effect waves-light delete-record">
@@ -367,6 +390,212 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="tab-pane" id="business_info" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header align-items-center d-flex">
+                                    <h4 class="card-title mb-0 flex-grow-1">Business Information</h4>
+                                </div>
+                                <div class="card-body">
+                                    <form id="shareholderForm" action="{{ route('update-profile', Auth::user()->id) }}"
+                                        method="POST">
+                                        @csrf
+                                        <div class="row">
+                                            <input type="text" name="request_type" value="bussiness_info" hidden>
+                                            <div class="col-lg-4">
+                                                <div class="form-label-group in-border mb-3">
+                                                    <label for="companyTitle" class="form-label">Company Title</label>
+                                                    <input type="text"
+                                                        class="form-control @if ($errors->has('companyTitle')) is-invalid @endif"
+                                                        id="companyTitle" name="companyTitle" placeholder="Please Enter"
+                                                        value="{{ Auth::user()->companyTitle }}">
+                                                    <div class="invalid-tooltip">
+                                                        @if ($errors->has('companyTitle'))
+                                                            {{ $errors->first('companyTitle') }}
+                                                        @else
+                                                            Company Title is required!
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                {{-- <label for="cityInput" class="form-label">City</label> --}}
+                                                <div class="form-label-group in-border mb-3">
+                                                    <label for="cityId" class="form-label">City</label>
+                                                    <select
+                                                        class="form-select form-control mb-3 @if ($errors->has('cityId')) is-invalid @endif"
+                                                        name="cityId">
+                                                        <option value=""
+                                                            @if (Auth::user()->cityId == '') {{ 'selected' }} @endif
+                                                            selected disabled>
+                                                            Select One
+                                                        </option>
+                                                        @foreach ($cities as $city)
+                                                            <option value="{{ $city->city_id }}"
+                                                                @if (Auth::user()->cityId == $city->city_id) {{ 'selected' }} @endif>
+                                                                {{ $city->title }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <div class="invalid-tooltip">
+                                                        @if ($errors->has('cityId'))
+                                                            {{ $errors->first('cityId') }}
+                                                        @else
+                                                            Select the City!
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <div class="form-label-group in-border mb-3">
+                                                    <label for="companyAddress" class="form-label">Address</label>
+                                                    <input type="text"
+                                                        class="form-control @if ($errors->has('companyAddress')) is-invalid @endif"
+                                                        id="companyAddress" name="companyAddress"
+                                                        placeholder="Please Enter"
+                                                        value="{{ Auth::user()->companyAddress }}">
+                                                    <div class="invalid-tooltip">
+                                                        @if ($errors->has('companyAddress'))
+                                                            {{ $errors->first('companyAddress') }}
+                                                        @else
+                                                            Address is required!
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <div class="form-label-group in-border mb-3">
+                                                    <label for="contactNumber" class="form-label">Phone Number</label>
+                                                    <input type="text"
+                                                        class="form-control @if ($errors->has('contactNumber')) is-invalid @endif"
+                                                        id="contactNumber" name="contactNumber"
+                                                        placeholder="Please Enter"
+                                                        value="{{ Auth::user()->contactNumber }}">
+                                                    <div class="invalid-tooltip">
+                                                        @if ($errors->has('contactNumber'))
+                                                            {{ $errors->first('contactNumber') }}
+                                                        @else
+                                                            Phone Number is required!
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <div class="form-label-group in-border mb-3">
+                                                    <label for="businessEmail" class="form-label">Email</label>
+                                                    <input type="text"
+                                                        class="form-control @if ($errors->has('businessEmail')) is-invalid @endif"
+                                                        id="businessEmail" name="businessEmail"
+                                                        placeholder="Please Enter"
+                                                        value="{{ Auth::user()->businessEmail }}">
+                                                    <div class="invalid-tooltip">
+                                                        @if ($errors->has('businessEmail'))
+                                                            {{ $errors->first('businessEmail') }}
+                                                        @else
+                                                            Email is required!
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <div class="form-label-group in-border mb-3">
+                                                    <label for="contactPerson" class="form-label">Contact Person</label>
+                                                    <input type="text"
+                                                        class="form-control @if ($errors->has('contactPerson')) is-invalid @endif"
+                                                        id="contactPerson" name="contactPerson"
+                                                        placeholder="Please Enter"
+                                                        value="{{ Auth::user()->contactPerson }}">
+                                                    <div class="invalid-tooltip">
+                                                        @if ($errors->has('contactPerson'))
+                                                            {{ $errors->first('contactPerson') }}
+                                                        @else
+                                                            Contact Person is required!
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                {{-- <label for="cityInput" class="form-label">City</label> --}}
+                                                <div class="form-label-group in-border mb-3">
+                                                    <label for="businessType" class="form-label">Business Type</label>
+                                                    <select
+                                                        class="form-select form-control mb-3 @if ($errors->has('businessType')) is-invalid @endif"
+                                                        name="businessType">
+                                                        <option
+                                                            @if (Auth::user()->businessType == '') {{ 'selected' }} @endif
+                                                            value="">Select</option>
+                                                        <option
+                                                            @if (Auth::user()->businessType == '0') {{ 'selected' }} @endif
+                                                            value="0">FIT and Small GROUP Business</option>
+                                                        <option
+                                                            @if (Auth::user()->businessType == '1') {{ 'selected' }} @endif
+                                                            value="1">Mainly MICE Business</option>
+                                                        <option
+                                                            @if (Auth::user()->businessType == '2') {{ 'selected' }} @endif
+                                                            value="2">Mainly Group Business</option>
+                                                    </select>
+                                                    <div class="invalid-tooltip">
+                                                        @if ($errors->has('businessType'))
+                                                            {{ $errors->first('businessType') }}
+                                                        @else
+                                                            Select the Business Type!
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                {{-- <label for="cityInput" class="form-label">City</label> --}}
+                                                <div class="form-label-group in-border mb-3">
+                                                    <label for="typeDescription" class="form-label">Description</label>
+                                                    <select
+                                                        class="form-select form-control mb-3 @if ($errors->has('typeDescription')) is-invalid @endif"
+                                                        name="typeDescription">
+                                                        <option
+                                                            @if (Auth::user()->typeDescription == '') {{ 'selected' }} @endif
+                                                            value="">Select</option>
+                                                        <option
+                                                            @if (Auth::user()->typeDescription == '1') {{ 'selected' }} @endif
+                                                            value="1">Tour Operator mainly focusing on Inbound
+                                                        </option>
+                                                        <option
+                                                            @if (Auth::user()->typeDescription == '2') {{ 'selected' }} @endif
+                                                            value="2">Travel Agent mainly focusing on Outbound
+                                                        </option>
+                                                    </select>
+                                                    <div class="invalid-tooltip">
+                                                        @if ($errors->has('businessType'))
+                                                            {{ $errors->first('businessType') }}
+                                                        @else
+                                                            Select the Description!
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12 col-sm-12 mb-3">
+                                                <label for="about" class="form-label">About</label>
+                                                <div id="snow-editor" style="height: 300px;">{!! Auth::user()->about !!}</div>
+                                                <input type="hidden" name="about" id="about"
+                                                    value="{{ Auth::user()->about }}">
+                                            </div>
+
+                                            <div class="col-lg-12">
+                                                <div class="hstack gap-2 justify-content-end">
+                                                    <button type="submit" class="btn btn-primary">Updates</button>
+                                                    <button type="button" class="btn btn-soft-success">Cancel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -380,4 +609,70 @@
 @endpush
 
 @push('footer_scripts')
+    <script src="{{ asset('theme/dist/default/assets/libs/quill/quill.min.js') }}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var quill_snow;
+            quill_snow = new Quill("#snow-editor", {
+                modules: {
+                    toolbar: [
+                        [{
+                            header: [1, 2, 3, 4, 5, 6, false]
+                        }],
+                        ["bold", "italic", "underline", "strike"],
+                        ["code-block"],
+                        ["link"],
+                        [{
+                            script: "sub"
+                        }, {
+                            script: "super"
+                        }],
+                        [{
+                            list: "ordered"
+                        }, {
+                            list: "bullet"
+                        }],
+                        ["clean"],
+                    ],
+                },
+                theme: "snow",
+            });
+            quill_snow.on("text-change", function(delta, oldDelta, source) {
+                $("#description").val(quill_snow.root.innerHTML);
+            });
+
+            $(document).on('click', '.showModal', function(e) {
+
+                e.preventDefault();
+
+                var target = $(this).data('target');
+                var url = $(this).data('url');
+                console.log('show modal', target, url);
+
+                $.ajax({
+
+                    url: url,
+                    type: "GET",
+                    // dataType: 'html',
+                    headers: {
+                        'X-CSRF-Token': '{{ csrf_token() }}',
+                    },
+                    cache: false,
+                    success: function(data) {
+                        $('#modal-div').html(data);
+                        $(target).modal('show');
+                    },
+                    error: function() {
+
+                    },
+                    beforeSend: function() {
+
+                    },
+                    complete: function() {
+
+                    }
+                });
+            });
+        });
+    </script>
 @endpush
