@@ -14,7 +14,9 @@ use App\Models\User;
 use App\Models\Expertise;
 use App\Models\Country;
 use App\Models\InvestmentRange;
+use App\Models\Operator;
 use App\Models\Sector;
+use App\Models\Staff;
 use App\Models\UserType;
 
 use Illuminate\Support\Str;
@@ -160,7 +162,29 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('staffs.add_new_profile');
+        $user = \Auth::user();
+        // return $this->json(["data"=>$user],200);
+        $list = array();
+        /*if($user->userable_type=="Admin")
+        {
+            $list= Staff::where("staffable_type","Admin")->get();
+        }*/
+        if ($user->hasRole("Staff")) {
+            $staff = Staff::find($user->userable_id);
+            $list = Staff::with("user")->where("staffable_type", $staff->staffable_type)->where("staffable_id", $staff->staffable_id)->get();
+        } else {
+            $list = Staff::with("user")->where("staffable_type", $user->userable_type)->where("staffable_id", $user->userable_id)->get();
+        }
+
+        $totalStaff = count($list);
+        $filteredList = array();
+        for ($i = 0; $i < $totalStaff; $i++) {
+            if ($list[$i]->user != NULL && $list[$i]->user->status > 0) {
+                array_push($filteredList, $list[$i]);
+            }
+        }
+        array_push($filteredList, $user);
+        return view('staffs.add_new_profile', ["data" => $filteredList, "user" => $user]);
     }
 
     /**
@@ -172,11 +196,55 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required | email | unique:users',
-            'password' => 'required | min:8|confirmed',
+            "fullName" => "required|min:5",
+            "phone" => "required",
+            "staffAdmin" => "required",
+            "username" => "required|alpha_dash|unique:users,username,NULL,NULL,deleted_at,NULL|min:5",
+            "email" => "required|email|unique:users,email,NULL,NULL,deleted_at,NULL",
         ]);
 
+        $loggedInUser = \Auth::user();
+
+        $staff = new Staff();
+        if ($loggedInUser->userable_type == "Operator") {
+            $staffable = Operator::find($loggedInUser->userable_id);
+        } else {
+            $staffable = User::find($loggedInUser->id);
+        }
+        $staff->reportsTo = $request->staffAdmin;
+
+        $staffable->staff()->save($staff);
+
+        $user = new User();
+        $user->name = $request->fullName;
+        $user->email = $request->email;
+        $user->username = strtolower($request->username);
+        $user->cityId = $loggedInUser->cityId;
+        $user->branchId = $loggedInUser->branchId;
+        $user->phone = $request->phone;
+        $user->status = 1;
+        $randString = Str::random(10);
+        $user->passwordText = $randString;
+        $user->password = Hash::make($randString);
+        //$user->credits=env("OPERATOR_CREDITS_FREE");
+        if ($request->hasFile("photo")) {
+            $imgOptions = ['folder' => 'guide_profile', 'format' => 'webp'];
+            $cloudder = Cloudder::upload($request->file('photo')->getRealPath(), null, $imgOptions);
+            $result = $cloudder->getResult();
+            if (isset($result["public_id"])) {
+                $user->profilePic = $result["public_id"];
+            }
+        }
+        $staff->user()->save($user);
+
+        $user->assignRole("Staff");
+
+        $userInfo["fullName"] = $user->name;
+        $userInfo["userName"] = $user->username;
+        $userInfo["email"] = $user->email;
+        $userInfo["password"] = $randString;
+
+        // Mail::to($user->email)->send(new StaffAccountEmail($userInfo));
         $input = $request->all();
 
         if ($request->password) {
