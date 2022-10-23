@@ -7,7 +7,7 @@
         <p class="text-muted mb-0">N/A</p>
         @endif
     </td>
-    <td>{{ $activity->serviceDate }} to {{ $activity->serviceEndDate }}</td>
+    <td>{{ $activity->serviceDate->format('M j, Y') }} to {{ $activity->serviceEndDate->format('M j, Y') }}</td>
     <td class="text-center">{{ $activity->unitCost }}</td>
     <td class="text-center">{{ $activity->totalUnits }}</td>
     <td class="text-center">{{ $activity->totalDays }}</td>

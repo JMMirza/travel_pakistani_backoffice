@@ -7,7 +7,7 @@
         <p class="text-muted mb-0">N/A</p>
         @endif
     </td>
-    <td>{{ $transport->serviceDate }} to {{ $transport->serviceDate }}</td>
+    <td>{{ $transport->serviceDate->format('M j, Y') }} to {{ $transport->serviceDate->format('M j, Y') }}</td>
     <td class="text-center">{{ $transport->unitCost }}</td>
     <td class="text-center">{{ $transport->totalUnits }}</td>
     <td class="text-center">{{ $transport->totalDays }}</td>
