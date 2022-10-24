@@ -53,16 +53,16 @@
                             </div>
                         </td>
                         <td scope="col">
-                            <select class="form-control quotation-input" id="markupType" name="markupType" {{ $quotation->markupType == 'Total' ? '' : '' }} }}>
+                            <select class="form-control quotation-input" id="markupTypeQuotation" name="markupTypeQuotation" {{ $quotation->markupType == 'Total' ? '' : 'readonly' }} }}>
                                 <option value="">Please select</option>
-                                <option value="Flat">Flat</option>
-                                <option value="Percentage">Percentage</option>
+                                <option value="Flat" {{ $quotation->markupTypeQuotation == 'Flat' ? 'selected' : '' }}>Flat</option>
+                                <option value="Percentage" {{ $quotation->markupTypeQuotation == 'Percentage' ? 'selected' : '' }}>Percentage</option>
                             </select>
                         </td>
                         <td scope="col">
                             <div class="input-group">
                                 <span class="input-group-text">PKR</span>
-                                <input id="markupValue" name="markupValue" class="form-control quotation-input" type="text" placeholder="Markup Value" value="0.0" {{ $quotation->markupType == 'Total' ? '' : '' }} min="0">
+                                <input id="extraMarkup" name="extraMarkup" class="form-control quotation-input" type="text" placeholder="Markup Value" value="0.0" {{ $quotation->markupType == 'Total' ? '' : 'readonly' }} min="0">
                             </div>
                         </td>
                         <td scope="col">
@@ -86,14 +86,14 @@
                         <td scope="col">
                             <select class="form-control quotation-input" id="discountType" name="discountType">
                                 <option value="">Please select</option>
-                                <option value="Flat">Flat</option>
-                                <option value="Percentage">Percentage</option>
+                                <option value="Flat" {{ $quotation->discountType == 'Flat' ? 'selected' : '' }}>Flat</option>
+                                <option value="Percentage" {{ $quotation->discountType == 'Percentage' ? 'selected' : '' }}>Percentage</option>
                             </select>
                         </td>
                         <td scope="col">
                             <div class="input-group">
                                 <span class="input-group-text">PKR</span>
-                                <input id="discountValue" name="discountValue" class="form-control quotation-input" type="text" placeholder="Discount Value" value="0.0" min="0">
+                                <input id="discountValue" name="discountValue" class="form-control quotation-input" type="text" placeholder="Discount Value" value="{{ $quotation->discountValue }}" min="0">
                             </div>
                         </td>
                         <td scope="col">
@@ -121,20 +121,43 @@
                         <td>
                             <div class="">
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="email" id="email-yes" value="1">
+                                    <input class="form-check-input" type="radio" name="email" id="email-yes" value="1" {{ $quotation->email == 1 ? 'checked' : '' }}>
                                     <label class="form-check-label" for="email-yes">Yes</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="email" id="email-no" value="0" checked>
+                                    <input class="form-check-input" type="radio" name="email" id="email-no" value="0" {{ $quotation->email == 0 ? 'checked' : '' }}>
                                     <label class="form-check-label" for="email-no">No</label>
                                 </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr id="emailOptionsSection" {{ $quotation->email == 1 ? 'style="display: block;"' : 'style="display: none;"' }}>
+                        <td>Email Price Options</td>
+                        <td>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="quotationEmailPriceItems" name="showCost" {{ $quotation->showCost == 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="quotationEmailPriceItems">
+                                    Show Cost Items on Quotation
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="quotationEmailPrice" name="showPrice" {{ $quotation->showPrice == 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="quotationEmailPrice">
+                                    Show Prices on Quotation
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="showPerPersonCost">
+                                <label class="form-check-label" for="showPerPersonCost" name="showPerPersonCost">
+                                    Show Per Person Cost
+                                </label>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td>Approve Version</td>
                         <td>
-                            <div class="form-check form-switch form-switch-md" dir="ltr">
+                            <div class=" form-check form-switch form-switch-md" dir="ltr">
                                 <input type="checkbox" class="form-check-input" id="approvedVersionId" name="approvedVersionId">
                             </div>
                         </td>
@@ -143,7 +166,7 @@
                         <td>Save As Template</td>
                         <td>
                             <div class="form-check form-switch form-switch-md" dir="ltr">
-                                <input type="checkbox" class="form-check-input" id="isTemplate" name="isTemplate">
+                                <input type="checkbox" class="form-check-input" id="isTemplate" name="isTemplate" {{ $quotation->isTemplate == 1 ? 'checked' : '' }}>
                             </div>
                         </td>
                     </tr>
@@ -151,14 +174,22 @@
                         <td>Expired?</td>
                         <td>
                             <div class="form-check form-switch form-switch-md" dir="ltr">
-                                <input type="checkbox" class="form-check-input" id="">
+                                <input type="checkbox" class="form-check-input" id="isExpired" name="isExpired" {{ $quotation->expiryReason ? 'checked' : '' }}>
                             </div>
                         </td>
                     </tr>
-                    <tr>
+                    <tr id="expiryReasonSection" {{ strlen($quotation->expiryReason) > 0 ? 'style="display: block"' : 'style="display: none"' }}>
                         <td>Reason</td>
                         <td>
-                            <textarea id="expiryReason" name="expiryReason" class="form-control" placeholder="Please enter expiry reason."></textarea>
+                            <select class=" form-control quotation-input" id="expiryReason" name="expiryReason">
+                                <option value="">Please select</option>
+                                <option value="Price was over budget" {{ $quotation->expiryReason == "Price was over budget" ? 'selected' : '' }}>Price was over budget</option>
+                                <option value="Customer booked with other operator" {{ $quotation->expiryReason == "Customer booked with other operator" ? 'selected' : '' }}>Customer booked with other operator</option>
+                                <option value="No availability on requested dates" {{ $quotation->expiryReason == "No availability on requested dates" ? 'selected' : '' }}>No availability on requested dates</option>
+                                <option value="Customer travel plan changed" {{ $quotation->expiryReason == "Customer travel plan changed" ? 'selected' : '' }}>Customer travel plan changed</option>
+                                <option value="Customer didn't Respond, Duplicate Inquiry" {{ $quotation->expiryReason == "Customer didn't Respond, Duplicate Inquiry" ? 'selected' : '' }}>Customer didn't Respond, Duplicate Inquiry</option>
+                                <option value="Others" {{ $quotation->expiryReason == "Others" ? 'selected' : '' }}>Others</option>
+                            </select>
                         </td>
                     </tr>
                 </tbody>
@@ -175,6 +206,26 @@
 @push('footer_scripts')
 <script>
     $(document).ready(function() {
+
+        $(':radio[name="email"]').change(function() {
+            var emailQuotationClient = $(this).filter(':checked').val();
+
+            if (emailQuotationClient == 1) {
+                $('#emailOptionsSection').show();
+            } else {
+                $('#emailOptionsSection').hide();
+            }
+        });
+
+        $('#isExpired').change(function() {
+            var isExpired = $(this).is(':checked');
+            console.log(isExpired);
+            if (isExpired == true) {
+                $('#expiryReasonSection').show();
+            } else {
+                $('#expiryReasonSection').hide();
+            }
+        });
 
         $(document).on('change keyup', '.quotation-input', function(e) {
 

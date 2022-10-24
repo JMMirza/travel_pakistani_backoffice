@@ -828,20 +828,42 @@ class QuotationController extends Controller
             return response()->json(['errors' => $validator->errors()->all()]);
         }
 
-        dd($request->all());
+
+        // dd($request->all());
 
         $quotationId = $request->input('quotationId', 0);
+        $emailToCustomer = $request->input('email', 0);
+
         $quotation = Quotation::find($quotationId);
 
-        $quotation->quotationId = $quotationId;
-        $quotation->title = $request->title;
-        $quotation->description = $request->description;
-        $quotation->type = $request->noteType;
-        $quotation->versionNo = $request->versionNo;
+        // $quotation->title = $request->personsCount;
+        // if not individual
+
+        if ($quotation->markupType == 'Total') {
+            $quotation->markupTypeQuotation = $request->markupTypeQuotation;
+            $quotation->extraMarkup = $request->extraMarkup;
+        }
+
+        $quotation->discountType = $request->discountType;
+        $quotation->discountValue = $request->discountValue;
+
+        if ($emailToCustomer == 1) {
+
+            $quotation->showPrice = $request->has('showPrice') ? 1 : 0;
+            $quotation->showCost = $request->has('showCost') ? 1 : 0;
+            $quotation->email = $emailToCustomer;
+        }
+
+        $quotation->isTemplate = $request->has('isTemplate') ? 1 : 0;
+        $quotation->expiryReason = $request->expiryReason;
+
+        // $quotation->versionNo = $request->finalAmount;
+        // $quotation->versionNo = $request->discountedAmount;
+        // $quotation->versionNo = $request->perPersonCost;
+
         $quotation->save();
 
-        $quotationNotes = QuotationNote::where(['quotationId' => $quotationId, 'type' => $request->noteType])->get();
-        return $this->noteRowsRender($quotationNotes, $request->serviceType);
+        return redirect()->back()->with('success', 'Quotation updated successflly');
     }
 
     public function deleteQuotationHotel($id)
@@ -922,6 +944,67 @@ class QuotationController extends Controller
         return response()->json(['quotation ' => $quotation]);
     }
 
+    public function saveQuotationImage(Request $request)
+    {
+        $image = $request->file('file');
+        $quotationId = $request->input('quotationId', 0);
+
+        if ($request->hasFile("file")) {
+
+            $imgOptions = ['folder' => 'TP-DestinationContent', 'format' => 'webp'];
+            $cloudder = Cloudder::upload($request->file("file")->getRealPath(), null, $imgOptions);
+
+            $imgName = '';
+
+            if ($cloudder) {
+                $result = $cloudder->getResult();
+                $imgName = $result['public_id'];
+            }
+
+            $image = new QuotationImage();
+            $image->quotationId = $quotationId;
+            $image->title = $request->file("file")->getClientOriginalName();
+            $image->image = $imgName;
+            $image->version = 0;
+            $image->save();
+
+            return response()->json($image);
+        }
+
+        return response()->json([]);
+    }
+
+    public function listQuotationImage(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $quotationId = $request->input('quotationId', 0);
+
+            $quotationImages = QuotationImage::where('quotationId', $quotationId)->get();
+
+            return Datatables::of($quotationImages)
+                ->addIndexColumn()
+                ->addColumn('created_at', function ($row) {
+                    return $row->created_at->format('Y-m-d');
+                })
+                ->addColumn('image', function ($row) {
+
+                    $imageUrl = Cloudder::show($row->image);
+                    return '<a class="link-success" href="' . $imageUrl . '" target="_blank">View Image</a>';
+                })
+                ->addColumn('action', function ($row) {
+
+                    return '
+                        <a data-table="quotations-images-table" href="' . route('remove-quotation-image', $row->id) . '" class="btn btn-danger delete-record btn-icon btn-sm waves-effect waves-light">
+                            <i class="ri-delete-bin-5-line"></i>
+                        </a>
+                    ';
+                })
+                ->rawColumns(['action', 'image'])
+                ->make(true);
+        }
+    }
+
     private function servicesRowsRender($services, $type)
     {
         // echo ($type);
@@ -954,6 +1037,13 @@ class QuotationController extends Controller
 
         return $rowsHtml;
     }
+
+    public function deleteQuotationImage($id)
+    {
+        QuotationImage::find($id)->delete();
+        return response()->json(["message" => "Photo Deleted Successfully!"], 200);
+    }
+
 
 
     //Legcy Code below
@@ -1441,12 +1531,6 @@ class QuotationController extends Controller
         return response()->json(["data" => $images], 200);
     }
 
-    function deleteQuotationImage(Request $request)
-    {
-        $id = $request->id;
-        QuotationImage::find($id)->delete();
-        return response()->json(["message" => "Photo Deleted Successfully!"], 200);
-    }
     function quotationImages(Request $request)
     {
         $quotationId = $request->route('id');
