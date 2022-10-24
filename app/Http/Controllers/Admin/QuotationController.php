@@ -1381,7 +1381,7 @@ class QuotationController extends Controller
             return response()->json(["message" => "Total remaining amount is PKR " . number_format($totalRemaining) . ". Please enter amount less than the remaining amount"], 422);
         }
 
-        //$totalRemaining = $totalRemaining-$invoiceAmount;        
+        //$totalRemaining = $totalRemaining-$invoiceAmount;
 
         $branchInfo = Branch::find(1);
 
@@ -1423,7 +1423,7 @@ class QuotationController extends Controller
 
         //return response()->json(["data"=>$banks],200);
 
-        // return response()->json(["message"=>$user->getRoleNames()],422);     
+        // return response()->json(["message"=>$user->getRoleNames()],422);
 
         $pdf = DOMPDF::loadView('invoicePDF', compact("id", "dueDate", "organizerName", "invoiceLogo", "organizerEmail", "description", "quotation", "invoiceAmount", "totalPaid", "totalRemaining", "user", "branchInfo", "tourFrom", "tourTo", "today", "totalSalesQuotation", "userDetails", "banks"))->save('invoicePDF/invoice_' . $id . '_' . $getTime . $randValue . '.pdf');
 
@@ -1719,7 +1719,7 @@ class QuotationController extends Controller
         $inquiryId = $request->inquiryId > 0 ? $request->inquiryId : 0;
 
         $request->request->add(["requiredServices" => array(), 'quotationStatus' => 6]);
-        //$request->quotationStatus                 
+        //$request->quotationStatus
         $quotation = $this->saveBasicInformation($request, $quotation, 1, $inquiryId);
         if (isset($quotation->id)) {
             $hashId = $quotation->id * 7585795975989869898667454765786;
@@ -1731,7 +1731,7 @@ class QuotationController extends Controller
         $notes = $this->saveNotes($request,$quotation->id,1);
         $basicItinerary=$this->saveBasicItinerary($request,$quotation);
         if($quotation)
-        {            
+        {
             if($request->inquiryId)
             {
                 $inquiry = Inquiry::find($request->inquiryId);
@@ -1745,7 +1745,7 @@ class QuotationController extends Controller
                 return response()->json(['data'=>$quotation,"message"=>"Email sent with quotation details"],201);
             }
             return response()->json(['data'=>$quotation,"message"=>"Quotation created successfully!"],201);
-        }            
+        }
         else
         return response()->json(['message'=>"Problem in creating quotation"],500);       */
     }
@@ -1783,23 +1783,23 @@ class QuotationController extends Controller
         /*$currentQuotation = Quotation::find($quotationId);
         $quotationParent = $currentQuotation->id;
         if($currentQuotation->quotationParent>0)
-        {            
-            $quotationParent = $currentQuotation->quotationParent;            
+        {
+            $quotationParent = $currentQuotation->quotationParent;
         }
-        $child = Quotation::selectRaw("max(id) as currentQuotation")->where("quotationParent",$quotationParent)->first();             
+        $child = Quotation::selectRaw("max(id) as currentQuotation")->where("quotationParent",$quotationParent)->first();
         $currentVersion = ($child && $child->currentQuotation>0)?Quotation::find($child->currentQuotation)->versionNo:1;        */
 
         $isNew = $request->isNew;
         $emailPdf = $request->emailType;
         $updateType = $request->updateType;
-        // $tourDates = explode("-",$request->tourDates);   
-        /*$child = Quotation::selectRaw("max(id) as currentQuotation")->where("quotationParent",$quotationParent)->first();                    
-        if($child->currentQuotation>0)        
-        {                                   
+        // $tourDates = explode("-",$request->tourDates);
+        /*$child = Quotation::selectRaw("max(id) as currentQuotation")->where("quotationParent",$quotationParent)->first();
+        if($child->currentQuotation>0)
+        {
             $currentQuotation=Quotation::find($child->currentQuotation);
-            $quotationParent = $currentQuotation->quotationParent; 
+            $quotationParent = $currentQuotation->quotationParent;
         }*/
-        //return response()->json(["data"=>$currentVersion],422);      
+        //return response()->json(["data"=>$currentVersion],422);
         if ($isNew && $updateType == "basic") {
             $quotation = new Quotation();
             $version = $totalVersions + 1;
@@ -1810,10 +1810,10 @@ class QuotationController extends Controller
             if (isset($request->isExpired) && $request->isExpired == 1) {
                 $request->request->add(['quotationStatus' => 3]);
             }
-            // return response()->json(["data"=>$request->quotationStatus],422);                  
-            //$this->removeExtraData($request,$quotation);        
+            // return response()->json(["data"=>$request->quotationStatus],422);
+            //$this->removeExtraData($request,$quotation);
         }
-        //return response()->json(["version"=>$version],422);    
+        //return response()->json(["version"=>$version],422);
         $this->authorize('update', $quotation);
         $quotation = $this->saveBasicInformation($request, $quotation, $version, $inquiryId);
 
@@ -1842,7 +1842,7 @@ class QuotationController extends Controller
         else if($updateType=="itinerary")
         {
             if(!$isNew)
-                $this->removeExtraData($request,$quotation,"itinerary");        
+                $this->removeExtraData($request,$quotation,"itinerary");
             $basicItinerary=$this->saveBasicItinerary($request,$quotation);
         }*/
         //return $updateType;
@@ -1949,7 +1949,7 @@ class QuotationController extends Controller
     {
         $quotationId = $quotation->id;
         // return $quotationId;
-        //$version = 1;  
+        //$version = 1;
 
         /*if($quotation->quotationParent > 0)
         {
@@ -2472,7 +2472,7 @@ class QuotationController extends Controller
                 $itinerary->day = $request->itineraryBasicDay[$i];
                 $itinerary->title = $request->itineraryBasicTitle[$i];
                 $itinerary->details = $request->itineraryBasicDesc[$i];
-                //$itineraryImage=NULL;                                
+                //$itineraryImage=NULL;
                 if (isset($fileInputImage[$i])) {
                     $imgOptions = ['folder' => 'itineraryPictures', 'format' => 'webp'];
                     $cloudder = Cloudder::upload($fileInputImage[$i]->getRealPath(), null, $imgOptions);
@@ -2972,7 +2972,7 @@ class QuotationController extends Controller
         $costColumn = isset($request->costType) ? $request->costType : 1;
         //return response()->json(["cost col"=>$costColumn],422);
         //"hotelQuotations","serviceQuotations","quotationNotes","itineraryBasic","quotationImages"
-        //$quotation = Quotation::with("city")->find($id);        
+        //$quotation = Quotation::with("city")->find($id);
         //return response()->json(["data"=>["id"=>$id,"route"=>$request->route("id")]],200);
         $quotation = Quotation::with(["city", "hotelQuotations", "quotationNotes", "serviceQuotations", "itineraryBasic" => function ($query) {
             $query->orderBy("day", "asc");
@@ -3190,7 +3190,7 @@ class QuotationController extends Controller
         }
         $version = $request->route("version");
         $costColumn = isset($request->costType) ? $request->costType : 1;
-        //return response()->json(["cost col"=>$costColumn],422);        
+        //return response()->json(["cost col"=>$costColumn],422);
         $quotation = Quotation::with(["city", "quotationNotes", "itineraryBasic"])->find($id);
         if ($quotation->status == 3) {
             return response()->json(["message" => "Quotation updated successfully!"], 200);
@@ -3199,7 +3199,7 @@ class QuotationController extends Controller
         $totalEmailsSent = $quotation->totalEmails;
         $quotation->totalEmails = $totalEmailsSent + 1;
         $quotation->save();
-        //  return response()->json(["data"=>$quotation->liveQuotation],422);            
+        //  return response()->json(["data"=>$quotation->liveQuotation],422);
         $user = User::find($quotation->userId);
         $hashId = $quotation->liveQuotation;
         // $result = array('totalCost'=>$quotation);
@@ -3249,7 +3249,7 @@ class QuotationController extends Controller
             $userInfo = User::find($quotation->userId);
             $staffInfo = $userInfo->userable;
             // $mailFrom = env("mail_from_address");
-            //$mailFromName = env("MAIL_FROM_NAME"); 
+            //$mailFromName = env("MAIL_FROM_NAME");
             if ($staffInfo->staffable_type == "Operator") {
                 $operatorInfo = Operator::find($staffInfo->staffable_id);
 
@@ -3338,7 +3338,7 @@ class QuotationController extends Controller
         // PDF::AddPage();
         // PDF::writeHTML($html_content, true, false, true, false, '');
         // PDF::Output(public_path('quotationPDF/quotation_' .$id. '.pdf'), 'F');
-        // PDF::reset();        
+        // PDF::reset();
 
         Mail::to($quotation->clientEmail)->send(new QuotationGenerated($quotation, $header, array("mailFromName" => $mailFromName, "mailFrom" => $mailFrom, "pdf" => $id, "poweredBy" => $poweredBy, "user" => $user, "requiredServices" => $requiredServices, "plannedAreas" => $plannedAreas, "validity" => $validity, "prefDates" => $prefDates, "costColumn" => $costColumn, "areaDetailsPDF" => $areaDetailsPDF, "hashId" => $hashId)));
         return response()->json(["message" => "Quotation finished and email sent successfully!"], 200);
@@ -3366,5 +3366,25 @@ class QuotationController extends Controller
         $Quotation->save();
 
         return response()->json(["message" => "Quotation Status Updated"], 200);
+    }
+
+    // written by mirza
+
+    public function showResponses(Request $request)
+    {
+
+        if ($request->ajax()) {
+
+            $data = QuotationResponse::orderBy("id", "desc")->with('quotation')->get();
+            // dd($data->toArray());
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    return view('quotations.response_actions', ['row' => $row]);
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+        return view('quotations.quotation_responses');
     }
 }
