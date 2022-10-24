@@ -18,7 +18,7 @@
                         enctype='multipart/form-data' action="{{ route('staffs.store') }}">
                         @csrf
 
-                        <div class="col-md-4 col-sm-12">
+                        <div class="col-md-6 col-sm-12">
                             <div class="form-label-group in-border">
                                 <label for="fullName" class="form-label">Full Name <span
                                         class="text-danger">*</span></label>
@@ -34,7 +34,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 col-sm-12">
+                        <div class="col-md-6 col-sm-12">
                             <div class="form-label-group in-border">
                                 <label for="investorEmail" class="form-label">Email <span
                                         class="text-danger">*</span></label>
@@ -52,7 +52,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 col-sm-12">
+                        <div class="col-md-6 col-sm-12">
                             <div class="form-label-group in-border">
                                 <label for="username" class="form-label">User Name <span
                                         class="text-danger">*</span></label>
@@ -86,23 +86,6 @@
                         </div>
 
                         <div class="col-md-6 col-sm-12">
-                            <div class="form-label-group in-border">
-                                <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="phone" name="phone"
-                                    placeholder="Please enter "
-                                    value="{{ isset($user_info) ? $user_info->phone : old('phone') }}" required>
-                                <div class="invalid-tooltip">
-                                    @if ($errors->has('phone'))
-                                        {{ $errors->first('phone') }}
-                                    @else
-                                        Phone is required!
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 col-sm-12">
-                            {{-- <label for="cityInput" class="form-label">City</label> --}}
                             <div class="form-label-group in-border mb-3">
                                 <label for="reportsTo" class="form-label">Reports To</label>
                                 <select

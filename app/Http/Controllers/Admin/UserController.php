@@ -279,6 +279,29 @@ class UserController extends Controller
         $user_info = User::where('id', $id)->first();
         // $user_info = $id;
 
+        $user = \Auth::user();
+        // return $this->json(["data"=>$user],200);
+        $list = array();
+        /*if($user->userable_type=="Admin")
+        {
+            $list= Staff::where("staffable_type","Admin")->get();
+        }*/
+        if ($user->hasRole("Staff")) {
+            $staff = Staff::find($user->userable_id);
+            $list = Staff::with("user")->where("staffable_type", $staff->staffable_type)->where("staffable_id", $staff->staffable_id)->get();
+        } else {
+            $list = Staff::with("user")->where("staffable_type", $user->userable_type)->where("staffable_id", $user->userable_id)->get();
+        }
+
+        $totalStaff = count($list);
+        $filteredList = array();
+        for ($i = 0; $i < $totalStaff; $i++) {
+            if ($list[$i]->user != NULL && $list[$i]->user->status > 0) {
+                array_push($filteredList, $list[$i]);
+            }
+        }
+        array_push($filteredList, $user);
+
         $data = [
             'user_info' => $user_info,
         ];
