@@ -17,18 +17,17 @@
                         action="{{ route('staffs.update', $user_info->id) }}">
                         @csrf
                         @method('PATCH')
-                        <input type="hidden" name="user_id" value="{{ $user_info->id }}">
                         <div class="col-md-6 col-sm-12">
                             <div class="form-label-group in-border">
-                                <label for="investorName" class="form-label">Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="investorName" name="name"
-                                    placeholder="Please enter "
-                                    value="{{ isset($user_info) ? $user_info->name : old('name') }}" required>
+                                <label for="fullName" class="form-label">Full Name <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="fullName" name="fullName"
+                                    placeholder="Please enter " value="{{ old('fullName') }}" required>
                                 <div class="invalid-tooltip">
-                                    @if ($errors->has('name'))
-                                        {{ $errors->first('name') }}
+                                    @if ($errors->has('fullName'))
+                                        {{ $errors->first('fullName') }}
                                     @else
-                                        Name is required!
+                                        Full Name is required!
                                     @endif
                                 </div>
                             </div>
@@ -53,25 +52,77 @@
                         </div>
 
                         <div class="col-md-6 col-sm-12">
-                            <label for="customer_type">
-                                Customer Type<span class="text-danger">*</span>
-                            </label>
                             <div class="form-label-group in-border">
-                                <label class="radio-inline mr-3">
-                                    <input type="radio" name="customer_type" value="individual"
-                                        @if ($user_info->customer_type == 'individual') checked @endif checked>
-                                    <span></span>{{ __('login.individual') }}
-                                </label>
-                                <label class="radio-inline mr-3">
-                                    <input type="radio" name="customer_type" value="corporate"
-                                        @if ($user_info->customer_type == 'corporate') checked @endif>
-                                    <span></span>{{ __('login.corporate') }}
-                                </label>
+                                <label for="username" class="form-label">User Name <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="username" name="username"
+                                    placeholder="Please enter "
+                                    value="{{ isset($user_info) ? $user_info->username : old('username') }}" required>
                                 <div class="invalid-tooltip">
-                                    @if ($errors->has('customer_type'))
-                                        {{ $errors->first('customer_type') }}
+                                    @if ($errors->has('username'))
+                                        {{ $errors->first('username') }}
                                     @else
-                                        Customer Type is required!
+                                        User Name is required!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-label-group in-border">
+                                <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="phone" name="phone"
+                                    placeholder="Please enter "
+                                    value="{{ isset($user_info) ? $user_info->phone : old('phone') }}" required>
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('phone'))
+                                        {{ $errors->first('phone') }}
+                                    @else
+                                        Phone is required!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-label-group in-border mb-3">
+                                <label for="reportsTo" class="form-label">Reports To</label>
+                                <select
+                                    class="form-select form-control mb-3 @if ($errors->has('reportsTo')) is-invalid @endif"
+                                    name="reportsTo">
+                                    <option value="" @if (old('reportsTo') == '') {{ 'selected' }} @endif
+                                        selected disabled>
+                                        Select One
+                                    </option>
+                                    @foreach ($data as $user)
+                                        <option value="{{ $user->id }}"
+                                            @if (old('reportsTo') == $user->id) {{ 'selected' }} @endif>
+                                            {{ $user->user }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('reportsTo'))
+                                        {{ $errors->first('reportsTo') }}
+                                    @else
+                                        Select the City!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-12 mb-3">
+                            <div class="form-label-group in-border">
+                                <label for="image" class="form-label">Image</label>
+                                <input type="file"
+                                    class="form-control @if ($errors->has('image')) is-invalid @endif" id="image"
+                                    name="image" placeholder="Please Enter Account Name" value="{{ old('image') }}"
+                                    required>
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('image'))
+                                        {{ $errors->first('image') }}
+                                    @else
+                                        Image is required!
                                     @endif
                                 </div>
                             </div>
@@ -122,8 +173,8 @@
                                         class="text-danger">*</span></label>
                                 <input type="password"
                                     class="form-control @if ($errors->has('password_confirmation')) is-invalid @endif"
-                                    id="password-confirm" name="password_confirmation" placeholder="Please enter " required
-                                    autocomplete="new-password">
+                                    id="password-confirm" name="password_confirmation" placeholder="Please enter "
+                                    required autocomplete="new-password">
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('password_confirmation'))
                                         {{ $errors->first('password_confirmation') }}

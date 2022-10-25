@@ -107,7 +107,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/delete/test/quotations', [QuotationController::class, 'deleteTestQuotations']);
     Route::get('/quotations/templates', [QuotationController::class, 'quotationTemplates']);
     Route::get('/quotations/order/{id}', [QuotationController::class, 'convertQuotation']);
-    Route::get('/quotations/all-responses', [QuotationController::class, 'getAllResponses']);
+    // Route::get('/quotations/all-responses', [QuotationController::class, 'getAllResponses']);
 
     Route::post('/quotations/invoice/{id}/{version}', [QuotationController::class, 'invoice']);
     Route::post('/quotations/sendInvoice/{id}/{version}/{amount}', [QuotationController::class, 'sendInvoice']);
@@ -139,6 +139,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/quotations/photos/{id}/{version}', [QuotationController::class, 'quotationImages']);
     Route::delete('/quotations/photos/delete/{id}', [QuotationController::class, 'deleteImage']);
 
+    //Quotation Response routes by mirza
+
+    Route::get('/quotations-responses', [QuotationController::class, 'showResponses'])->name('quotations-responses');
     //Quotation routes ends
 
 
