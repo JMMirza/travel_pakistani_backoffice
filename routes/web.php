@@ -128,7 +128,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/quotations/chat/{id}', [QuotationController::class, 'getQuotationChat']);
     Route::post('/quotations/changeStatus', [QuotationController::class, 'changeStatus']);
 
-    Route::get('/quotations/response/details/{id}', [QuotationController::class, 'getQuotationResponseDetails']);
+    // Route::get('/quotations/response/details/{id}', [QuotationController::class, 'getQuotationResponseDetails']);
     Route::get('/quotations/view/{id}/{version}', [QuotationController::class, 'show']);
     Route::post('/quotations/update/{id}/{version}', [QuotationController::class, 'update']);
     Route::get('/quotations/photos/{id}/{version}', [QuotationController::class, 'images']);
@@ -142,6 +142,8 @@ Route::group(['middleware' => ['auth']], function () {
     //Quotation Response routes by mirza
 
     Route::get('/quotations-responses', [QuotationController::class, 'showResponses'])->name('quotations-responses');
+    Route::get('/quotations-response-details/{id}', [QuotationController::class, 'getQuotationResponseDetails'])->name('quotations-response-details');
+    Route::get('/quotations-chat/{id}', [QuotationController::class, 'getQuotationChat'])->name('quotations-chat');
     //Quotation routes ends
 
 
