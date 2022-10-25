@@ -9,7 +9,7 @@
                 <div class="d-flex align-items-center">
                     <h5 class="card-title mb-0 flex-grow-1">Quotations</h5>
                     <div class="flex-shrink-0">
-                        <a href="{{ route('quotation-save') }}" class="btn btn-success btn-label btn-sm">
+                        <a href="{{ route('quotation-save', ['tab' => 1]) }}" class="btn btn-success btn-label btn-sm">
                             <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Add Quotation
                         </a>
                     </div>

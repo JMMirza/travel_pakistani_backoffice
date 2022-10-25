@@ -99,13 +99,13 @@
                         <td scope="col">
                             <div class="input-group">
                                 <span class="input-group-text">PKR</span>
-                                <input id="discountedAmount" name="discountedAmount" class="form-control quotation-input" type="text" placeholder="Final Amount" value="{{ number_format($totalCost) }}" min="0">
+                                <input id="discountedAmount" name="discountedAmount" class="form-control quotation-input" type="text" placeholder="Final Amount" value="{{ number_format($discountedAmount) }}" min="0">
                             </div>
                         </td>
                         <td scope="col">
                             <div class="input-group">
                                 <span class="input-group-text">PKR</span>
-                                <input id="perPersonCost" name="perPersonCost" class="form-control quotation-input" type="text" placeholder="Per Person Cost" value="{{ number_format(($totalCost/$totalPersons)) }}" min="0" readonly>
+                                <input id="perPersonCost" name="perPersonCost" class="form-control quotation-input" type="text" placeholder="Per Person Cost" value="{{ number_format(($discountedAmount/$totalPersons)) }}" min="0" readonly>
                             </div>
                         </td>
                     </tr>
@@ -231,18 +231,15 @@
 
             let output = parseFloat($('#totalCost').val().replace(/,/g, ''));
 
-
             var totalCost = parseFloat($('#totalCost').val().replace(/,/g, ''));
-            var markupType = $('#markupType').find(":selected").val();
-            var markupValue = parseFloat($('#markupValue').val().replace(/,/g, ''));
+            var markupType = $('#markupTypeQuotation').find(":selected").val();
+            var markupValue = parseFloat($('#extraMarkup').val().replace(/,/g, ''));
             var finalAmount = parseFloat($('#finalAmount').val().replace(/,/g, ''));
             var discountType = $('#discountType').find(":selected").val();
             var discountValue = parseFloat($('#discountValue').val().replace(/,/g, ''));
             var discountedAmount = parseFloat($('#discountedAmount').val().replace(/,/g, ''));
             var perPersonCost = parseFloat($('#perPersonCost').val().replace(/,/g, ''));
             var personsCount = parseFloat($('#personsCount').val().replace(/,/g, ''));
-
-            // console.log(markupType);
 
             var amount = 0;
             var discountAmount = 0;

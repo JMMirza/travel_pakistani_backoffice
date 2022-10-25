@@ -127,10 +127,16 @@ class QuotationController extends Controller
         return view('quotations.quotations_list', ['status' => $status]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $cities = City::all();
-        return view('quotations.quotation_form', ['cities' => $cities, 'quotation_id' => 0]);
+        $users = User::all();
+        return view('quotations.quotation_form', [
+            'cities' => $cities,
+            'users' => $users,
+            'quotation_id' => 0,
+            // 'tab' => $request->has('tab') ? $request->tab : 1
+        ]);
     }
 
     public function saveBasicInformation(Request $request)
@@ -139,11 +145,18 @@ class QuotationController extends Controller
 
         $quotationData = $request->all();
 
+        $inquiryId = $request->input('inquiryId', 0);
+        $quotationId = $request->input('quotationId', 0);
+        $isNew = $request->input('isNew', 1);
+
+        if ($inquiryId > 0) {
+            $quotationData['inquiryId'] = $inquiryId;
+        }
+
         $quotationData['quotationParent'] = null;
         $quotationData['requiredServices'] = json_encode([]);
         $quotationData['extraMarkup'] = 0;
         $quotationData['markupTypeQuotation'] = '';
-
 
         $quotationData['userId'] = $user->id;
         $quotationData['citiesToVisit'] = json_encode($request->citiesToVisit);
@@ -152,14 +165,32 @@ class QuotationController extends Controller
         $quotationData['tourFrom'] = trim($tourDates[0]);
         $quotationData['tourEnd'] = trim($tourDates[1]);
 
-        $quotation = Quotation::create($quotationData);
+        // dd($quotationData);
 
-        return redirect()->route('quotation-edit?tab=1', $quotation->id);
+        if ($isNew == 1 && $quotationId > 0) {
+
+            $quotation = Quotation::find($quotationId);
+            $totalVersions = Quotation::where("quotationParent", $quotationId)->count();
+            $quotationData['version'] = $totalVersions + 1;
+            $quotationData['quotationParent'] = $quotationId;
+            $quotation = Quotation::create($quotationData);
+
+            // Need to copy all the data from previous version of the qoutation
+
+        } else if ($isNew == 0 && $quotationId > 0) {
+            $quotation = Quotation::find($quotationId)->update($quotationData);
+        } else {
+            $quotation = Quotation::create($quotationData);
+        }
+
+        return redirect()->route('quotation-edit', $quotation->id)->with('success', 'Quotation updated successflly');
     }
 
     public function edit(Request $request, $id)
     {
         $cities = City::all();
+        $users = User::all();
+
         $quotation = Quotation::where(['id' => $id])->with([
             "user",
             "hotelQuotations",
@@ -179,21 +210,38 @@ class QuotationController extends Controller
 
         $totalCost = 0;
         $finalAmount = 0;
+        $discountedAmount = 0;
 
         if ($quotation->markupType == 'Total') {
             $hotelCostSum = $quotation->hotelQuotations->sum('hotelCost');
             $serviceCostSum = $quotation->serviceQuotations->sum('serviceCost');
-            $totalCost = $finalAmount = $hotelCostSum + $serviceCostSum;
+            $discountedAmount = $totalCost = $finalAmount = $hotelCostSum + $serviceCostSum;
+
+            if ($quotation->markupTypeQuotation == 'Percentage') {
+                $extraMarkupValue = (($request->extraMarkup / 100) * $finalAmount);
+                $discountedAmount = $finalAmount = $finalAmount - $extraMarkupValue;
+            } else {
+                $discountedAmount = $finalAmount = $finalAmount - $quotation->extraMarkup;
+            }
         }
 
         if ($quotation->markupType == 'Individual') {
             $hotelCostSum = $quotation->hotelQuotations->sum('hotelSales');
             $serviceCostSum = $quotation->serviceQuotations->sum('serviceSales');
-            $totalCost = $finalAmount = $hotelCostSum + $serviceCostSum;
+            $discountedAmount = $totalCost = $finalAmount = $hotelCostSum + $serviceCostSum;
+        }
+
+
+        if ($quotation->discountType == 'Percentage') {
+            $discountValue = (($request->discountValue / 100) * $finalAmount);
+            $discountedAmount = $finalAmount - $discountValue;
+        } else {
+            $discountedAmount = $finalAmount - $quotation->discountValue;
         }
 
         return view('quotations.quotation_form', [
             'cities' => $cities,
+            'users' => $users,
             'quotation' => $quotation,
             'quotation_id' => $quotation->id,
             'services' => json_decode($quotation->requiredServices),
@@ -201,6 +249,7 @@ class QuotationController extends Controller
             'tab' => isset($request->tab) ? $request->tab : 1,
             'totalCost' => $totalCost,
             'finalAmount' => $finalAmount,
+            'discountedAmount' => $discountedAmount,
             'totalPersons' => ($quotation->adults + $quotation->children),
 
         ]);
@@ -828,11 +877,10 @@ class QuotationController extends Controller
             return response()->json(['errors' => $validator->errors()->all()]);
         }
 
-
-        // dd($request->all());
-
         $quotationId = $request->input('quotationId', 0);
         $emailToCustomer = $request->input('email', 0);
+        $isApproved = $request->has('isApproved') ? 1 : 0;
+        $isExpired = $request->has('isExpired') ? 1 : 0;
 
         $quotation = Quotation::find($quotationId);
 
@@ -848,18 +896,36 @@ class QuotationController extends Controller
         $quotation->discountValue = $request->discountValue;
 
         if ($emailToCustomer == 1) {
-
             $quotation->showPrice = $request->has('showPrice') ? 1 : 0;
             $quotation->showCost = $request->has('showCost') ? 1 : 0;
             $quotation->email = $emailToCustomer;
         }
 
         $quotation->isTemplate = $request->has('isTemplate') ? 1 : 0;
-        $quotation->expiryReason = $request->expiryReason;
 
-        // $quotation->versionNo = $request->finalAmount;
-        // $quotation->versionNo = $request->discountedAmount;
-        // $quotation->versionNo = $request->perPersonCost;
+        if ($isExpired == 1) {
+            $quotation->quotationStatus = 3;
+            $quotation->expiryReason = $request->expiryReason;
+        }
+
+        if ($isApproved > 0 && $quotation->status != 3) {
+            $quotationParentId = $quotation->id;
+
+            if ($quotation->quotationParent != NULL) {
+                $quotationParentId = $quotation->quotationParent;
+            }
+
+            \DB::table("quotations")->where("quotationParent", $quotationParentId)->update(["approvedVersionId" => $quotation->id]);
+            \DB::table("quotations")->where("id", $quotationParentId)->update(["approvedVersionId" => $quotation->id, "status" => 8]);
+            $quotation->status = 8;
+        } else {
+            $quotationParentId = $quotation->id;
+            if ($quotation->quotationParent != NULL) {
+                $quotationParentId = $quotation->quotationParent;
+            }
+            \DB::table("quotations")->where("quotationParent", $quotationParentId)->update(["approvedVersionId" => NULL]);
+            \DB::table("quotations")->where("id", $quotationParentId)->update(["approvedVersionId" => NULL]);
+        }
 
         $quotation->save();
 
