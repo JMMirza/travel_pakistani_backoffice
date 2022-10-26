@@ -1180,18 +1180,18 @@ class QuotationController extends Controller
         ], 200);
     }
 
-    public function getQuotationChat($id)
-    {
+    // public function getQuotationChat($id)
+    // {
 
-        // $id = base64_decode($id);
-        $id = $id;
+    //     // $id = base64_decode($id);
+    //     $id = $id;
 
-        \DB::enableQueryLog();
-        $quotationsChat = QuotationChat::where('quotationId', $id)->orderBy("id", "desc")->get();
-        return response()->json([
-            'data' => $quotationsChat,
-        ], 200);
-    }
+    //     \DB::enableQueryLog();
+    //     $quotationsChat = QuotationChat::where('quotationId', $id)->orderBy("id", "desc")->get();
+    //     return response()->json([
+    //         'data' => $quotationsChat,
+    //     ], 200);
+    // }
 
     public function submitQuotationChat(Request $request)
     {
@@ -1262,23 +1262,23 @@ class QuotationController extends Controller
         }
     }
 
-    public function getQuotationResponseDetails($id)
-    {
-        \DB::enableQueryLog();
-        $quotationsResponses = QuotationResponse::where('id', $id)->orderBy("id", "desc")->with('quotation')->first();
+    // public function getQuotationResponseDetails($id)
+    // {
+    //     \DB::enableQueryLog();
+    //     $quotationsResponses = QuotationResponse::where('id', $id)->orderBy("id", "desc")->with('quotation')->first();
 
-        $response = QuotationResponse::find($id);
-        $newStatus = "";
-        if ($response->status == "new") {
-            $response->status = "viewed";
-            $response->save();
-            $newStatus = "viewed";
-        }
-        return response()->json([
-            'data' => $quotationsResponses,
-            'newStatus' => $newStatus
-        ], 200);
-    }
+    //     $response = QuotationResponse::find($id);
+    //     $newStatus = "";
+    //     if ($response->status == "new") {
+    //         $response->status = "viewed";
+    //         $response->save();
+    //         $newStatus = "viewed";
+    //     }
+    //     return response()->json([
+    //         'data' => $quotationsResponses,
+    //         'newStatus' => $newStatus
+    //     ], 200);
+    // }
 
     public function updateItineraryImage(Request $request)
     {
@@ -3485,16 +3485,44 @@ class QuotationController extends Controller
 
         if ($request->ajax()) {
 
-            $data = QuotationResponse::orderBy("id", "desc")->with('quotation')->get();
+            $data = QuotationResponse::with('quotation')->latest('created_at')->get();
             // dd($data->toArray());
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     return view('quotations.response_actions', ['row' => $row]);
                 })
-                ->rawColumns(['action'])
+                ->addColumn('status', function ($row) {
+                    if ($row->status == 'viewed') {
+                        return '<span class="badge bg-secondary">Viewed</span>';
+                    }
+                    if ($row->status == 'new') {
+                        return '<span class="badge bg-success">New</span>';
+                    }
+                    if ($row->status == 'confirmed') {
+                        return '<span class="badge bg-primary">Confirmed</span>';
+                    }
+                })
+                ->rawColumns(['action', 'status'])
                 ->make(true);
         }
         return view('quotations.quotation_responses');
+    }
+
+    public function getQuotationResponseDetails($id)
+    {
+        // \DB::enableQueryLog();
+        $quotationsResponses = QuotationResponse::where('id', $id)->with('quotation')->first();
+        if ($quotationsResponses->status == "new") {
+            $quotationsResponses->status = "viewed";
+            $quotationsResponses->save();
+        }
+        return view('quotations.quotation_response_modal', ['response' => $quotationsResponses]);
+    }
+
+    public function getQuotationChat($id)
+    {
+        $quotationsChat = QuotationChat::where('quotationId', $id)->orderBy("id", "desc")->get();
+        return view('quotations.quotation_response_chat', ['chat' => $quotationsChat]);
     }
 }
