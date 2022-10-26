@@ -9,6 +9,14 @@ class QuotationNote extends Model
 {
     use SoftDeletes;
 
+    protected $fillable = [
+        'quotationId',
+        'title',
+        'description',
+        'type',
+        'versionNo',
+    ];
+
     protected $dates = [
         'created_at',
         'updated_at',

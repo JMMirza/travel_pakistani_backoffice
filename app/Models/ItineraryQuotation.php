@@ -9,6 +9,17 @@ use App\Models\Landmark;
 class ItineraryQuotation extends Model
 {
     use SoftDeletes;
+
+    protected $fillable = [
+        'quotationable_type',
+        'quotationable_id',
+        'day',
+        'title',
+        'details',
+        'photo',
+        'landmarks',
+    ];
+
     protected $appends = ["itineraryLandmarks"];
 
     public function quotationable()

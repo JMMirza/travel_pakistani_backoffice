@@ -87,8 +87,12 @@
         e.preventDefault();
 
         var url = $(this).attr('action');
+
         // var formData = $(this).serializeArray();
-        var formData = new FormData(document.getElementById("itineraryQuotationForm"));
+        // var formData = new FormData(document.getElementById("itineraryQuotationForm"));
+
+        var form = $('#itineraryQuotationForm')[0];
+        var formData = new FormData(form);
         var targetModal = $(this).data('target-modal');
         // var targetRenderTable = $(this).data('render-tbl');
 
@@ -97,6 +101,10 @@
             url: url,
             data: formData,
             type: "POST",
+            enctype: 'multipart/form-data',
+            processData: false, // Important!
+            contentType: false,
+            cache: false,
             // dataType: 'json',
             headers: {
                 'X-CSRF-Token': '{{ csrf_token() }}',
@@ -120,6 +128,8 @@
                 } else {
                     // console.log('#' + targetRenderTable, resp);
                     jQuery(targetModal + ' .alert-danger').hide();
+                    showToast('Record added successfully!', 'success');
+                    jQuery(targetModal).modal('hide');
                     // $('#' + targetRenderTable).html(resp);
                 }
 

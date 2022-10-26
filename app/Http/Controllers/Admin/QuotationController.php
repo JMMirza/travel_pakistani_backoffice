@@ -146,7 +146,7 @@ class QuotationController extends Controller
         $quotationData = $request->all();
 
         $inquiryId = $request->input('inquiryId', 0);
-        $quotationId = $request->input('quotationId', 0);
+        $quotationId = (int) $request->input('quotationId', 0);
         $isNew = $request->input('isNew', 1);
 
         if ($inquiryId > 0) {
@@ -169,14 +169,56 @@ class QuotationController extends Controller
 
         if ($isNew == 1 && $quotationId > 0) {
 
-            $quotation = Quotation::find($quotationId);
+            $quotationPrevious = Quotation::find($quotationId);
             $totalVersions = Quotation::where("quotationParent", $quotationId)->count();
             $quotationData['version'] = $totalVersions + 1;
             $quotationData['quotationParent'] = $quotationId;
             $quotation = Quotation::create($quotationData);
 
-            // Need to copy all the data from previous version of the qoutation
+            if ($quotation) {
+                if ($quotationPrevious->itineraryBasic) {
+                    $quotationPrevious->itineraryBasic->map(function ($row, $key) use ($quotation) {
+                        $row->quotationId = $quotation->id;
+                        $quotation->itineraryBasic()->create($row->toArray());
+                    });
+                }
 
+                $hotelQuotations = HotelQuotation::where('quotationId', $quotationId)->get();
+
+                if ($hotelQuotations) {
+                    $hotelQuotations->map(function ($row, $key) use ($quotation) {
+                        $row->quotationId = $quotation->id;
+                        HotelQuotation::create($row->toArray());
+                    });
+                }
+
+                $serviceQuotations = ServiceQuotation::where('quotationId', $quotationId)->get();
+
+                if ($serviceQuotations) {
+                    $serviceQuotations->map(function ($row, $key) use ($quotation) {
+                        $row->quotationId = $quotation->id;
+                        ServiceQuotation::create($row->toArray());
+                    });
+                }
+
+                $quotationNotes = QuotationNote::where('quotationId', $quotationId)->get();
+
+                if ($quotationNotes) {
+                    $quotationNotes->map(function ($row, $key) use ($quotation) {
+                        $row->quotationId = $quotation->id;
+                        QuotationNote::create($row->toArray());
+                    });
+                }
+
+                $quotationImages = QuotationImage::where('quotationId', $quotationId)->get();
+
+                if ($quotationImages) {
+                    $quotationImages->map(function ($row, $key) use ($quotation) {
+                        $row->quotationId = $quotation->id;
+                        QuotationImage::create($row->toArray());
+                    });
+                }
+            }
         } else if ($isNew == 0 && $quotationId > 0) {
             $quotation = Quotation::find($quotationId)->update($quotationData);
         } else {
@@ -460,15 +502,19 @@ class QuotationController extends Controller
             $quotationItinerary->day = $request->itineraryDay;
             $quotationItinerary->title = $request->title;
             $quotationItinerary->details = $request->itineraryDescription;
+            $quotationItinerary->save();
         } else {
-            $quotationItinerary = new ItineraryQuotation();
 
-            $quotationItinerary->day = $request->itineraryDay;
-            $quotationItinerary->title = $request->title;
-            $quotationItinerary->details = $request->itineraryDescription;
+            $quotation = Quotation::find($quotationId);
+
+            $data = [
+                'day' => $request->itineraryDay,
+                'title' => $request->title,
+                'details' => $request->itineraryDescription,
+            ];
+
+            $quotation->itineraryBasic()->create($data);
         }
-
-        $quotationItinerary->save();
     }
 
     public function saveQuotationHotel(Request $request)
@@ -1093,12 +1139,12 @@ class QuotationController extends Controller
         return $rowsHtml;
     }
 
-    private function noteRowsRender($services, $type = '')
+    private function noteRowsRender($notes, $type = '')
     {
         $rowsHtml = '';
 
-        foreach ($services as $key => $service) {
-            $rowsHtml .= view('quotations.activity_quotation_table_row', ['activity' => $service])->render();
+        foreach ($notes as $key => $noteRow) {
+            $rowsHtml .= view('quotations.notes_quotation_table_row', ['noteRow' => $noteRow])->render();
         }
 
         return $rowsHtml;
@@ -1109,8 +1155,6 @@ class QuotationController extends Controller
         QuotationImage::find($id)->delete();
         return response()->json(["message" => "Photo Deleted Successfully!"], 200);
     }
-
-
 
     //Legcy Code below
 

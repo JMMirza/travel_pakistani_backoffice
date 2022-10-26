@@ -9,6 +9,26 @@ class ServiceQuotation extends Model
 {
     use SoftDeletes;
 
+    protected $fillable = [
+        'quotationId',
+        'description',
+        'serviceDateType',
+        'serviceDate',
+        'serviceEndDate',
+        'serviceType',
+        'calculateByDays',
+        'totalDays',
+        'instructions',
+        'unitCost',
+        'totalUnits',
+        'markupValue',
+        'markupType',
+        'serviceCost',
+        'serviceMarkupAmount',
+        'serviceSales',
+        'versionNo',
+    ];
+
     protected $dates = [
         'serviceDate',
         'serviceEndDate',

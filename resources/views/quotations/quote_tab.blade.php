@@ -329,6 +329,9 @@
                         // console.log('#' + targetRenderTable, resp);
                         jQuery(targetModal + ' .alert-danger').hide();
                         $('#' + targetRenderTable).html(resp);
+                        showToast('Record added successfully!', 'success');
+                        jQuery(targetModal).modal('hide');
+
                     }
 
                 },

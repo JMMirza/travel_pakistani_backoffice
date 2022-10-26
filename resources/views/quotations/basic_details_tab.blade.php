@@ -73,8 +73,8 @@
             <input type="text" value="{{ isset($quotation->otherAreas) ? $quotation->otherAreas : '' }}" class="form-control" id="otherAreas" placeholder="Enter otherAreas" name="otherAreas">
         </div>
         <div class="col-md-12">
-            <label for="staffRemarks" class="form-label">Staff Remarks <span class="text-danger">*</span></label>
-            <textarea class="form-control" id="staffRemarks" placeholder="Enter staffRemarks" name="staffRemarks" required>{{ isset($quotation->staffRemarks) ? $quotation->staffRemarks : '' }}</textarea>
+            <label for="staffRemarks" class="form-label">Staff Remarks </label>
+            <textarea class="form-control" id="staffRemarks" placeholder="Enter staffRemarks" name="staffRemarks">{{ isset($quotation->staffRemarks) ? $quotation->staffRemarks : '' }}</textarea>
         </div>
         <div class="col-md-12">
             <label for="processedBy" class="form-label">Managed By <span class="text-danger">*</span></label>
