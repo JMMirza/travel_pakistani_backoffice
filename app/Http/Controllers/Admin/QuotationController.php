@@ -41,7 +41,7 @@ use Cloudder;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Support\Facades\Hash;
 use DataTables;
-
+use Exception;
 
 class QuotationController extends Controller
 {
@@ -1193,57 +1193,57 @@ class QuotationController extends Controller
     //     ], 200);
     // }
 
-    public function submitQuotationChat(Request $request)
-    {
+    // public function submitQuotationChat(Request $request)
+    // {
 
-        $result = "";
+    //     $result = "";
 
-        $quotationId = (int)$request->quotationId;
-        // $quotationId = base64_decode($quotationId);
-        // $quotationId = $quotationId / 7585795975989869898667454765786;
+    //     $quotationId = (int)$request->quotationId;
+    //     // $quotationId = base64_decode($quotationId);
+    //     // $quotationId = $quotationId / 7585795975989869898667454765786;
 
-        $quotation = Quotation::find($quotationId);
-        try {
+    //     $quotation = Quotation::find($quotationId);
+    //     try {
 
-            $response = new QuotationChat();
+    //         $response = new QuotationChat();
 
-            $response->quotationId = $quotationId;
-            $response->message = $request->message;
-            $response->type = $request->type;
+    //         $response->quotationId = $quotationId;
+    //         $response->message = $request->message;
+    //         $response->type = $request->type;
 
-            $response->save();
+    //         $response->save();
 
-            $username = "923139367626"; ///Your Username
-            $password = "Wonderweal-99"; ///Your Password
-            $sender = "26144";
+    //         $username = "923139367626"; ///Your Username
+    //         $password = "Wonderweal-99"; ///Your Password
+    //         $sender = "26144";
 
-            if ($response->type == 'owner') {
+    //         if ($response->type == 'owner') {
 
-                $mobile = $quotation->clientContact;
+    //             $mobile = $quotation->clientContact;
 
-                $message = "You recieved a new quotation reply. Please visit - https://travelpakistani.com/quotation/chat/" . $response->quotationId . " to check.";
+    //             $message = "You recieved a new quotation reply. Please visit - https://travelpakistani.com/quotation/chat/" . $response->quotationId . " to check.";
 
-                $post = "sender=" . urlencode($sender) . "&mobile=" . urlencode($mobile) . "&message=" . urlencode($message) . "";
+    //             $post = "sender=" . urlencode($sender) . "&mobile=" . urlencode($mobile) . "&message=" . urlencode($message) . "";
 
-                $url = "https://sendpk.com/api/sms.php?username=" . $username . "&password=" . $password . "";
-                $ch = curl_init();
+    //             $url = "https://sendpk.com/api/sms.php?username=" . $username . "&password=" . $password . "";
+    //             $ch = curl_init();
 
-                $timeout = 30; // set to zero for no timeout
-                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)');
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-                $result = curl_exec($ch);
-            }
+    //             $timeout = 30; // set to zero for no timeout
+    //             curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)');
+    //             curl_setopt($ch, CURLOPT_URL, $url);
+    //             curl_setopt($ch, CURLOPT_POST, 1);
+    //             curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+    //             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+    //             $result = curl_exec($ch);
+    //         }
 
-            return response()->json(["message" => "Submittied Successfully", "status" => 200, "sms_response" => $result], 200);
-        } catch (Exception $e) {
+    //         return response()->json(["message" => "Submittied Successfully", "status" => 200, "sms_response" => $result], 200);
+    //     } catch (Exception $e) {
 
-            return response()->json($e - getMessage(), 500);
-        }
-    }
+    //         return response()->json($e - getMessage(), 500);
+    //     }
+    // }
     public function updateQuotationResponse(Request $request)
     {
 
@@ -3523,6 +3523,57 @@ class QuotationController extends Controller
     public function getQuotationChat($id)
     {
         $quotationsChat = QuotationChat::where('quotationId', $id)->orderBy("id", "desc")->get();
-        return view('quotations.quotation_response_chat', ['chat' => $quotationsChat]);
+        return view('quotations.quotation_response_chat', ['chat' => $quotationsChat, 'quotationId' => $id]);
+    }
+
+    public function submitQuotationChat(Request $request)
+    {
+
+        $result = "";
+
+        $quotationId = (int)$request->quotationId;
+        // $quotationId = base64_decode($quotationId);
+        // $quotationId = $quotationId / 7585795975989869898667454765786;
+
+        $quotation = Quotation::find($quotationId);
+        try {
+
+            $response = new QuotationChat();
+
+            $response->quotationId = $quotationId;
+            $response->message = $request->message;
+            $response->type = $request->type;
+
+            $response->save();
+
+            $username = "923139367626"; ///Your Username
+            $password = "Wonderweal-99"; ///Your Password
+            $sender = "26144";
+
+            if ($response->type == 'owner') {
+
+                $mobile = $quotation->clientContact;
+
+                $message = "You recieved a new quotation reply. Please visit - https://travelpakistani.com/quotation/chat/" . $response->quotationId . " to check.";
+
+                $post = "sender=" . urlencode($sender) . "&mobile=" . urlencode($mobile) . "&message=" . urlencode($message) . "";
+
+                $url = "https://sendpk.com/api/sms.php?username=" . $username . "&password=" . $password . "";
+                $ch = curl_init();
+
+                $timeout = 30; // set to zero for no timeout
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)');
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+                $result = curl_exec($ch);
+            }
+
+            return redirect()->back()->with("success", "Submittied Successfully");
+        } catch (Exception $e) {
+            return redirect()->back()->with("error", "Error occurred");
+        }
     }
 }
