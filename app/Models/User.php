@@ -60,10 +60,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->morphOne(Self::class, 'userable');
     }
 
-    public function staff()
-    {
-        return $this->morphOne(Staff::class, 'staffable');
-    }
+    // public function staff()
+    // {
+    //     return $this->morphOne(Staff::class, 'staffable');
+    // }
 
     public function reportingStaff()
     {

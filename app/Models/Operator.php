@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\User;
-use App\Models\Admin\Staff;
+use App\Models\Staff;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -33,6 +33,6 @@ class Operator extends Model
 
     public function staff()
     {
-        return $this->morphOne(Staff::class, 'staffable');
+        return $this->morphMany(Staff::class, 'staffable');
     }
 }
