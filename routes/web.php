@@ -144,6 +144,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/quotations-responses', [QuotationController::class, 'showResponses'])->name('quotations-responses');
     Route::get('/quotations-response-details/{id}', [QuotationController::class, 'getQuotationResponseDetails'])->name('quotations-response-details');
     Route::get('/quotations-chat/{id}', [QuotationController::class, 'getQuotationChat'])->name('quotations-chat');
+    Route::post('/quotations-send-chat', [QuotationController::class, 'submitQuotationChat'])->name('quotations-send-chat');
     //Quotation routes ends
 
 
