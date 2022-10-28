@@ -8,11 +8,16 @@
             <div class="card-header align-items-center d-flex">
                 <h4 class="card-title mb-0 flex-grow-1">Create Quotation</h4>
 
-                <!-- <div class="flex-shrink-0">
-                        <a href="{{ route('staffs.index') }}" class="btn btn-success btn-label btn-sm">
-                            <i class="ri-arrow-left-fill label-icon align-middle fs-16 me-2"></i> Back
-                        </a>
-                    </div> -->
+                @if($quotation)
+                <div class="flex-shrink-0">
+                    <a href="https://travelpakistani.com/quotation/{{ $quotation->liveQuotation }}" class="btn btn-success btn-label btn-sm">
+                        <i class="ri-file-list-3-line label-icon align-middle fs-16 me-2"></i> View Quotation
+                    </a>
+                    <a href="{{ route('staffs.index') }}" class="btn btn-success btn-label btn-sm">
+                        <i class=" ri-chat-1-line label-icon align-middle fs-16 me-2"></i> Contact Custumer
+                    </a>
+                </div>
+                @endif
             </div>
             <div class="card-body">
                 <!-- <ul class="nav nav-tabs nav-border-top nav-border-top-primary mb-3" role="tablist">

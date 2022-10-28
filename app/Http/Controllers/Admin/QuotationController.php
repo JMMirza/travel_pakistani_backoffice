@@ -165,14 +165,14 @@ class QuotationController extends Controller
         $quotationData['tourFrom'] = trim($tourDates[0]);
         $quotationData['tourEnd'] = trim($tourDates[1]);
 
-        // dd($quotationData);
+        // dd($isNew);
 
         if ($isNew == 1 && $quotationId > 0) {
 
             $quotationPrevious = Quotation::find($quotationId);
             $totalVersions = Quotation::where("quotationParent", $quotationId)->count();
             $quotationData['version'] = $totalVersions + 1;
-            $quotationData['quotationParent'] = $quotationId;
+            $quotationData['quotationParent'] = $quotationPrevious->quotationParent > 0 ? $quotationPrevious->quotationParent : $quotationId;
             $quotation = Quotation::create($quotationData);
 
             if ($quotation) {
@@ -220,9 +220,16 @@ class QuotationController extends Controller
                 }
             }
         } else if ($isNew == 0 && $quotationId > 0) {
-            $quotation = Quotation::find($quotationId)->update($quotationData);
+            $quotation = Quotation::find($quotationId);
+            $quotation->update($quotationData);
         } else {
             $quotation = Quotation::create($quotationData);
+        }
+
+        if ($quotation && empty($quotation->liveQuotation)) {
+            $hashId = $quotation->id * 7585795975989869898667454765786;
+            $quotation->liveQuotation = $hashId;
+            $quotation->save();
         }
 
         return redirect()->route('quotation-edit', $quotation->id)->with('success', 'Quotation updated successflly');
