@@ -37,13 +37,19 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+
+
+        $user = \Auth::user();
+
+        // $user = User::with('userable.staff.user')->where('id', $user->id)->first();
+        // $data = $user->userable->staff;
+
+        // dd($data);
+
         if ($request->ajax()) {
-            $data = User::with(['roles', 'permissions'])->whereHas(
-                'roles',
-                function ($q) {
-                    $q->where('name', 'staff');
-                }
-            )->get();
+
+            $user = User::with('userable.staff.user')->where('id', $user->id)->first();
+            $data = $user->userable->staff;
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -53,15 +59,7 @@ class UserController extends Controller
                         <a href="' . route('staff-profile', $row->id) . '" class="btn btn-sm btn-success btn-icon waves-effect waves-light"><i class="mdi mdi-lead-pencil"></i></a>';
                     return $actionBtn;
                 })
-                ->addColumn('roles', function ($row) {
-                    $count = ($row->roles->count());
-                    return $count;
-                })
-                ->addColumn('permissions', function ($row) {
-                    $count = ($row->permissions->count());
-                    return $count;
-                })
-                ->rawColumns(['action', 'roles', 'permissions'])
+                ->rawColumns(['action'])
                 ->make(true);
         }
         return view('staffs.index');
@@ -137,7 +135,6 @@ class UserController extends Controller
         }
     }
 
-
     public function updateUserRolesPermissions(Request $request, $id)
     {
         $modelKey = 'users';
@@ -163,28 +160,8 @@ class UserController extends Controller
     public function create()
     {
         $user = \Auth::user();
-        // return $this->json(["data"=>$user],200);
-        $list = array();
-        /*if($user->userable_type=="Admin")
-        {
-            $list= Staff::where("staffable_type","Admin")->get();
-        }*/
-        if ($user->hasRole("Staff")) {
-            $staff = Staff::find($user->userable_id);
-            $list = Staff::with("user")->where("staffable_type", $staff->staffable_type)->where("staffable_id", $staff->staffable_id)->get();
-        } else {
-            $list = Staff::with("user")->where("staffable_type", $user->userable_type)->where("staffable_id", $user->userable_id)->get();
-        }
-
-        $totalStaff = count($list);
-        $filteredList = array();
-        for ($i = 0; $i < $totalStaff; $i++) {
-            if ($list[$i]->user != NULL && $list[$i]->user->status > 0) {
-                array_push($filteredList, $list[$i]);
-            }
-        }
-        array_push($filteredList, $user);
-        return view('staffs.add_new_profile', ["data" => $filteredList, "user" => $user]);
+        $user = User::with('userable.staff.user')->where('id', $user->id)->first();
+        return view('staffs.add_new_profile', ["user" => $user]);
     }
 
     /**
@@ -198,7 +175,7 @@ class UserController extends Controller
         $request->validate([
             "fullName" => "required|min:5",
             "phone" => "required",
-            "staffAdmin" => "required",
+            "reportsTo" => "required",
             "username" => "required|alpha_dash|unique:users,username,NULL,NULL,deleted_at,NULL|min:5",
             "email" => "required|email|unique:users,email,NULL,NULL,deleted_at,NULL",
         ]);
@@ -206,14 +183,19 @@ class UserController extends Controller
         $loggedInUser = \Auth::user();
 
         $staff = new Staff();
-        if ($loggedInUser->userable_type == "Operator") {
+
+        if ($loggedInUser->userable_type == "App\Models\Operator") {
             $staffable = Operator::find($loggedInUser->userable_id);
         } else {
             $staffable = User::find($loggedInUser->id);
         }
-        $staff->reportsTo = $request->staffAdmin;
 
+        // dd($staffable);
+
+        $staff->reportsTo = $request->reportsTo;
         $staffable->staff()->save($staff);
+
+
 
         $user = new User();
         $user->name = $request->fullName;
@@ -235,9 +217,10 @@ class UserController extends Controller
                 $user->profilePic = $result["public_id"];
             }
         }
+
         $staff->user()->save($user);
 
-        $user->assignRole("Staff");
+        $user->assignRole("staff");
 
         $userInfo["fullName"] = $user->name;
         $userInfo["userName"] = $user->username;
@@ -276,36 +259,14 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $user_info = User::where('id', $id)->first();
-        // $user_info = $id;
-
         $user = \Auth::user();
-        // return $this->json(["data"=>$user],200);
-        $list = array();
-        /*if($user->userable_type=="Admin")
-        {
-            $list= Staff::where("staffable_type","Admin")->get();
-        }*/
-        if ($user->hasRole("Staff")) {
-            $staff = Staff::find($user->userable_id);
-            $list = Staff::with("user")->where("staffable_type", $staff->staffable_type)->where("staffable_id", $staff->staffable_id)->get();
-        } else {
-            $list = Staff::with("user")->where("staffable_type", $user->userable_type)->where("staffable_id", $user->userable_id)->get();
-        }
-
-        $totalStaff = count($list);
-        $filteredList = array();
-        for ($i = 0; $i < $totalStaff; $i++) {
-            if ($list[$i]->user != NULL && $list[$i]->user->status > 0) {
-                array_push($filteredList, $list[$i]);
-            }
-        }
-        array_push($filteredList, $user);
+        $user_info = User::where('id', $id)->first();
+        $user = User::with('userable.staff.user')->where('id', $user->id)->first();
 
         $data = [
             'user_info' => $user_info,
+            'user' => $user,
         ];
-
 
         return view('staffs.edit_profile', $data);
     }
