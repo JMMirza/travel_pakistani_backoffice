@@ -9,7 +9,9 @@ use App\Models\User;
 class ItineraryTemplateDetail extends Model
 {
     use SoftDeletes;
-
+    protected $fillable = [
+        'cityId', 'templateId', 'dayNo', 'pickupTime', 'description', 'photo'
+    ];
     public function template()
     {
         return $this->belongsTo(ItineraryTemplate::class, "templateId");

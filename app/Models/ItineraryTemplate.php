@@ -9,7 +9,9 @@ use App\Models\User;
 class ItineraryTemplate extends Model
 {
     use SoftDeletes;
-
+    protected $fillable = [
+        'userId', 'templateTitle', 'categoryId', 'totalDays', 'templateType', 'status'
+    ];
     protected $dates = [
 
         'created_at',

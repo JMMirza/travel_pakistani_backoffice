@@ -7,7 +7,7 @@
             @include('itinerary_templates.edit_itinerary_template')
         @else
             {{-- @permission('add-country') --}}
-            @include('itinerary_templates.add_new_itinerary_template')
+{{--            @include('itinerary_templates.add_new_itinerary_template')--}}
             {{-- @endpermission --}}
         @endif
         <div class="col-lg-12">
