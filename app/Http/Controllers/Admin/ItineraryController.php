@@ -4,9 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\City;
 use App\Models\ItineraryTemplate;
+use App\Models\ItineraryTemplateDetail;
+use App\Models\QuotationImage;
 use Illuminate\Http\Request;
 use DataTables;
+use Auth;
+use Cloudder;
 use Illuminate\Database\QueryException;
 
 class ItineraryController extends Controller
@@ -51,7 +56,10 @@ class ItineraryController extends Controller
      */
     public function create()
     {
-        //
+        //return 'your in';
+        $categories = Category::all();
+        $cities = City::all();
+        return view('itinerary_templates.itinerary_form',compact('cities','categories'));
     }
 
     /**
@@ -64,20 +72,20 @@ class ItineraryController extends Controller
     {
         $request->validate([
             "templateType" => "required", "string",
-            "templateTitle" => "required|string|min:6",
-            "totalDays" => "required|integer",
+            "days" => "required|integer",
+            "status" => "required|integer",
             "categoryId" => "required|integer"
         ]);
         $userId = Auth::user()->id;
         $input['userId'] = $userId;
-        $input['templateType'] = $request->type;
-        $input['templateTitle'] = $request->title;
+        $input['templateType'] = $request->templateType;
+        $input['templateTitle'] = $request->templateTitle;
         $input['totalDays'] = $request->days;
-        $input['categoryId'] = $request->category;
+        $input['categoryId'] = $request->categoryId;
         $input['status'] = $request->status;
 
-        ItineraryTemplate::create($input);
-        return redirect()->route('itinerary-templates.index')
+        $ItineraryTemplateObj=ItineraryTemplate::create($input);
+        return redirect()->route('itinerary-templates.edit', $ItineraryTemplateObj->id)
             ->with('success', 'Itinerary Template created successfully.');
     }
 
@@ -100,9 +108,12 @@ class ItineraryController extends Controller
      */
     public function edit($id)
     {
+
         $itinerary_template = ItineraryTemplate::find($id);
+
         $categories = Category::all();
-        return view('itinerary_templates.itinerary_templates', ['itinerary_template' => $itinerary_template, 'categories' => $categories]);
+        $cities = City::all();
+        return view('itinerary_templates.itinerary_form_details_tab', ['itinerary_template' => $itinerary_template, 'categories' => $categories, 'cities' => $cities]);
     }
 
     /**
@@ -129,8 +140,37 @@ class ItineraryController extends Controller
         $input['categoryId'] = $request->categoryId;
         $input['status'] = $request->status;
 
-        $itinerary_template->update($input);
-        return redirect()->route('templates.index')
+        $itinerary_obj=$itinerary_template->update($input);
+
+
+        $int_detail['templateId'] = $id;
+        $int_detail['cityId'] = $request->itineraryCities;
+        $int_detail['dayNo'] = $request->numberDays;
+        $int_detail['pickupTime'] = $request->pickupTime;
+        $int_detail['description'] = $request->discription;
+
+        $itinerary_templateObj=ItineraryTemplateDetail::create($int_detail);
+
+
+        //Photo upload
+        if ($request->hasFile("photo")) {
+
+            $imgOptions = ['folder' => 'TP-DestinationContent', 'format' => 'webp'];
+            $cloudder = Cloudder::upload($request->file("photo")->getRealPath(), null, $imgOptions);
+
+            $imgName = '';
+
+            if ($cloudder) {
+                $result = $cloudder->getResult();
+                $imgName = $result['public_id'];
+            }
+
+                  $itinerary_update=ItineraryTemplateDetail::where('id',$itinerary_templateObj->id)->update(['photo'=>$imgName]);
+
+        }
+
+
+        return redirect()->route('itinerary-templates.index')
             ->with('success', 'Template updated successfully.');
     }
 
