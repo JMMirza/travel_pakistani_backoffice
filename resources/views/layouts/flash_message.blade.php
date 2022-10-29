@@ -56,5 +56,11 @@
 <div class="alert alert-danger">
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     Check the following errors :(
+
+    @if ($errors->any())
+    @foreach ($errors->all() as $error)
+    <li>{{$error}}</li>
+    @endforeach
+    @endif
 </div>
 @endif
