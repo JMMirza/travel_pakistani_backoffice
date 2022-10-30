@@ -59,7 +59,6 @@ class QuotationController extends Controller
                     ->orderBy("id", "desc")
                     ->with('user', 'city', 'inquiry', 'statusDetail', 'processedByUser');
             } else {
-
                 $quotations = Quotation::whereNull("quotationParent")
                     ->where("userId", $user->id)
                     ->orWhere("processedBy", $user->id)
