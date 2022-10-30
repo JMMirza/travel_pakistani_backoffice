@@ -37,14 +37,10 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-
-
         $user = \Auth::user();
 
         // $user = User::with('userable.staff.user')->where('id', $user->id)->first();
-        // $data = $user->userable->staff;
-
-        // dd($data);
+        // dd($user->userable->staff->toArray());
 
         if ($request->ajax()) {
 
@@ -190,12 +186,8 @@ class UserController extends Controller
             $staffable = User::find($loggedInUser->id);
         }
 
-        // dd($staffable);
-
         $staff->reportsTo = $request->reportsTo;
         $staffable->staff()->save($staff);
-
-
 
         $user = new User();
         $user->name = $request->fullName;
