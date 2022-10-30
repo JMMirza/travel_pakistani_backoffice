@@ -56,7 +56,7 @@ class UserController extends Controller
                 ->addColumn('action', function ($row) {
                     // if(isset($row->employee->id)){
                     $actionBtn = '
-                        <a href="' . route('staff-profile', $row->id) . '" class="btn btn-sm btn-success btn-icon waves-effect waves-light"><i class="mdi mdi-lead-pencil"></i></a>';
+                        <a href="' . route('staff-profile', $row->user->id) . '" class="btn btn-sm btn-success btn-icon waves-effect waves-light"><i class="mdi mdi-lead-pencil"></i></a>';
                     return $actionBtn;
                 })
                 ->rawColumns(['action'])

@@ -34,7 +34,7 @@ class ItineraryTemplate extends Model
 
     public function city()
     {
-        return $this->belongsTo(City::class, "cityId");
+        return $this->belongsTo(City::class, "cityId", "city_id");
     }
 
     public function templateDetails()

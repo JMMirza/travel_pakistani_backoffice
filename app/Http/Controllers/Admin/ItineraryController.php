@@ -25,9 +25,12 @@ class ItineraryController extends Controller
     {
         $user = \Auth::user();
         $categories = Category::all();
+
         if ($request->ajax()) {
 
-            $data = ItineraryTemplate::where('userId', $user->id)->with("category")->latest()->get();
+            // $data = ItineraryTemplate::where('userId', $user->id)->with("category")->latest()->get();
+            $data = ItineraryTemplate::with("category")->latest()->get();
+
             return Datatables::of($data)
                 ->addIndexColumn()
                 // ->addColumn('preferredDate', function ($row) {
@@ -54,12 +57,15 @@ class ItineraryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //return 'your in';
         $categories = Category::all();
         $cities = City::all();
-        return view('itinerary_templates.itinerary_form',compact('cities','categories'));
+        return view('itinerary_templates.add_itinerary_template', [
+            'cities' => $cities,
+            'categories' => $categories,
+            'tab' => $request->has('tab') ? $request->tab : 1
+        ]);
     }
 
     /**
@@ -76,6 +82,7 @@ class ItineraryController extends Controller
             "status" => "required|integer",
             "categoryId" => "required|integer"
         ]);
+
         $userId = Auth::user()->id;
         $input['userId'] = $userId;
         $input['templateType'] = $request->templateType;
@@ -84,9 +91,8 @@ class ItineraryController extends Controller
         $input['categoryId'] = $request->categoryId;
         $input['status'] = $request->status;
 
-        $ItineraryTemplateObj=ItineraryTemplate::create($input);
-        return redirect()->route('itinerary-templates.edit', $ItineraryTemplateObj->id)
-            ->with('success', 'Itinerary Template created successfully.');
+        $ItineraryTemplateObj = ItineraryTemplate::create($input);
+        return redirect(route('itinerary-templates.edit', $ItineraryTemplateObj->id) . '?tab=2')->with('success', 'Itinerary Template created successfully.');
     }
 
     /**
@@ -106,14 +112,23 @@ class ItineraryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
-
-        $itinerary_template = ItineraryTemplate::find($id);
-
+        $itinerary_template = ItineraryTemplate::findOrFail($id);
         $categories = Category::all();
         $cities = City::all();
-        return view('itinerary_templates.itinerary_form_details_tab', ['itinerary_template' => $itinerary_template, 'categories' => $categories, 'cities' => $cities]);
+
+        // dd($itinerary_template->with(['templateDetails.city'])->first()->toArray());
+
+        return view(
+            'itinerary_templates.edit_itinerary_template',
+            [
+                'itinerary_template' => $itinerary_template->with(['templateDetails.city', 'category'])->first(),
+                'categories' => $categories,
+                'cities' => $cities,
+                'tab' => $request->has('tab') ? $request->tab : 1
+            ]
+        );
     }
 
     /**
@@ -140,7 +155,7 @@ class ItineraryController extends Controller
         $input['categoryId'] = $request->categoryId;
         $input['status'] = $request->status;
 
-        $itinerary_obj=$itinerary_template->update($input);
+        $itinerary_obj = $itinerary_template->update($input);
 
 
         $int_detail['templateId'] = $id;
@@ -149,7 +164,7 @@ class ItineraryController extends Controller
         $int_detail['pickupTime'] = $request->pickupTime;
         $int_detail['description'] = $request->discription;
 
-        $itinerary_templateObj=ItineraryTemplateDetail::create($int_detail);
+        $itinerary_templateObj = ItineraryTemplateDetail::create($int_detail);
 
 
         //Photo upload
@@ -165,8 +180,7 @@ class ItineraryController extends Controller
                 $imgName = $result['public_id'];
             }
 
-                  $itinerary_update=ItineraryTemplateDetail::where('id',$itinerary_templateObj->id)->update(['photo'=>$imgName]);
-
+            $itinerary_update = ItineraryTemplateDetail::where('id', $itinerary_templateObj->id)->update(['photo' => $imgName]);
         }
 
 
