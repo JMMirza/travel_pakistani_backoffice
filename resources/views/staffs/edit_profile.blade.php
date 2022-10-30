@@ -115,13 +115,13 @@
 
                         <div class="col-md-6 col-sm-12 mb-3">
                             <div class="form-label-group in-border">
-                                <label for="image" class="form-label">Image</label>
+                                <label for="photo" class="form-label">Image</label>
                                 <input type="file"
-                                    class="form-control @if ($errors->has('image')) is-invalid @endif" id="image"
-                                    name="image" placeholder="Please Enter Account Name" value="{{ old('image') }}">
+                                    class="form-control @if ($errors->has('photo')) is-invalid @endif" id="photo"
+                                    name="photo" placeholder="Please Enter Account Name" value="{{ old('photo') }}">
                                 <div class="invalid-tooltip">
-                                    @if ($errors->has('image'))
-                                        {{ $errors->first('image') }}
+                                    @if ($errors->has('photo'))
+                                        {{ $errors->first('photo') }}
                                     @else
                                         Image is required!
                                     @endif

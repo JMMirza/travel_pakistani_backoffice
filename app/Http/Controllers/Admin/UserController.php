@@ -18,6 +18,8 @@ use App\Models\Operator;
 use App\Models\Sector;
 use App\Models\Staff;
 use App\Models\UserType;
+use App\Notifications\SendPasswordToNewStaff;
+use Cloudder;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
@@ -194,13 +196,14 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->username = strtolower($request->username);
         $user->cityId = $loggedInUser->cityId;
-        $user->branchId = $loggedInUser->branchId;
+        $user->branchId = 1;
         $user->phone = $request->phone;
         $user->status = 1;
         $randString = Str::random(10);
         $user->passwordText = $randString;
         $user->password = Hash::make($randString);
-        //$user->credits=env("OPERATOR_CREDITS_FREE");
+        $user->credits = env("OPERATOR_CREDITS_FREE");
+
         if ($request->hasFile("photo")) {
             $imgOptions = ['folder' => 'guide_profile', 'format' => 'webp'];
             $cloudder = Cloudder::upload($request->file('photo')->getRealPath(), null, $imgOptions);
@@ -212,22 +215,14 @@ class UserController extends Controller
 
         $staff->user()->save($user);
 
-        $user->assignRole("staff");
+        $user->attachRole("staff");
 
-        $userInfo["fullName"] = $user->name;
-        $userInfo["userName"] = $user->username;
-        $userInfo["email"] = $user->email;
-        $userInfo["password"] = $randString;
+        $data = [
+            'email' => $user->email,
+            'password' => $user->passwordText,
+        ];
+        $user->notify(new SendPasswordToNewStaff($data));
 
-        // Mail::to($user->email)->send(new StaffAccountEmail($userInfo));
-        $input = $request->all();
-
-        if ($request->password) {
-            $input['password'] = bcrypt($request->password);
-        }
-
-        $user = User::create($input);
-        $user->attachRole('staff');
         return redirect(route('staffs.index'))->with('success', 'Staff created successfully');
     }
 
@@ -299,6 +294,15 @@ class UserController extends Controller
             $logged_user->phone = $request->phone;
             $logged_user->status = 1;
             $logged_user->save();
+        }
+        if ($request->hasFile("photo")) {
+            $imgOptions = ['folder' => 'guide_profile', 'format' => 'webp'];
+            $cloudder = Cloudder::upload($request->file('photo')->getRealPath(), null, $imgOptions);
+            $result = $cloudder->getResult();
+            if (isset($result["public_id"])) {
+                $logged_user->profilePic = $result["public_id"];
+                $logged_user->save();
+            }
         }
         return redirect()->route('staffs.index')->with('success', 'Staff updated successfully');
     }
