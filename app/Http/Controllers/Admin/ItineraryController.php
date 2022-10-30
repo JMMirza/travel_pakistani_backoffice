@@ -20,9 +20,11 @@ class ItineraryController extends Controller
     {
         $user = \Auth::user();
         $categories = Category::all();
+
         if ($request->ajax()) {
 
-            $data = ItineraryTemplate::where('userId', $user->id)->with("category")->latest()->get();
+            // $data = ItineraryTemplate::where('userId', $user->id)->with("category")->latest()->get();
+            $data = ItineraryTemplate::with("category")->latest()->get();
             return Datatables::of($data)
                 ->addIndexColumn()
                 // ->addColumn('preferredDate', function ($row) {

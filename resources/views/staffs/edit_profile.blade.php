@@ -19,7 +19,7 @@
                     <div class="col-md-6 col-sm-12">
                         <div class="form-label-group in-border">
                             <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Please enter " value="{{ old('fullName') }}" required>
+                            <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Please enter " value="{{ isset($user_info) ? $user_info->name : old('fullName') }}" required>
                             <div class="invalid-tooltip">
                                 @if ($errors->has('fullName'))
                                 {{ $errors->first('fullName') }}

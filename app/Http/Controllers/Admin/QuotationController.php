@@ -135,7 +135,7 @@ class QuotationController extends Controller
             'cities' => $cities,
             'users' => $users,
             'quotation_id' => 0,
-            // 'tab' => $request->has('tab') ? $request->tab : 1
+            'tab' => $request->has('tab') ? $request->tab : 1
         ]);
     }
 
@@ -148,12 +148,14 @@ class QuotationController extends Controller
         $inquiryId = $request->input('inquiryId', 0);
         $quotationId = (int) $request->input('quotationId', 0);
         $isNew = $request->input('isNew', 1);
+        $staffRemarks = $request->input('staffRemarks', '');
 
         if ($inquiryId > 0) {
             $quotationData['inquiryId'] = $inquiryId;
         }
 
         $quotationData['quotationParent'] = null;
+        $quotationData['staffRemarks'] = is_null($staffRemarks) ? '' : $staffRemarks;
         $quotationData['requiredServices'] = json_encode([]);
         $quotationData['extraMarkup'] = 0;
         $quotationData['markupTypeQuotation'] = '';
@@ -162,10 +164,14 @@ class QuotationController extends Controller
         $quotationData['citiesToVisit'] = json_encode($request->citiesToVisit);
 
         $tourDates = explode("to", $request->tourDates);
-        $quotationData['tourFrom'] = trim($tourDates[0]);
-        $quotationData['tourEnd'] = trim($tourDates[1]);
 
-        // dd($isNew);
+        if (count($tourDates) == 2) {
+            $quotationData['tourFrom'] = trim($tourDates[0]);
+            $quotationData['tourEnd'] = trim($tourDates[1]);
+        } else {
+            $quotationData['tourFrom'] = trim($tourDates[0]);
+            // $quotationData['tourEnd'] = null;
+        }
 
         if ($isNew == 1 && $quotationId > 0) {
 
@@ -351,6 +357,8 @@ class QuotationController extends Controller
 
     public function addQuotationItinerary(Request $request)
     {
+        $quotationId = $request->input('quotation_id', 0);
+
         $itinerary_templates = ItineraryTemplateDetail::where('id', $request->itinerary_detail_id)->with('template')->first();
         $itinerary = new ItineraryQuotation();
         $itinerary->day = 1;
@@ -360,6 +368,15 @@ class QuotationController extends Controller
 
         $quotation = Quotation::find($request->quotation_id);
         $quotation->itineraryBasic()->save($itinerary);
+
+        $rowsHtml = '';
+        $quotation = Quotation::find($quotationId);
+
+        foreach ($quotation->itineraryBasic as $key => $itinerary) {
+            $rowsHtml .= view('quotations.itinerary_card', ['itinerary' => $itinerary])->render();
+        }
+
+        return $rowsHtml;
     }
 
     public function removeQuotationItinerary($id)
@@ -522,6 +539,16 @@ class QuotationController extends Controller
 
             $quotation->itineraryBasic()->create($data);
         }
+
+        $rowsHtml = '';
+
+        $quotation = Quotation::find($quotationId);
+
+        foreach ($quotation->itineraryBasic as $key => $itinerary) {
+            $rowsHtml .= view('quotations.itinerary_card', ['itinerary' => $itinerary])->render();
+        }
+
+        return $rowsHtml;
     }
 
     public function saveQuotationHotel(Request $request)
