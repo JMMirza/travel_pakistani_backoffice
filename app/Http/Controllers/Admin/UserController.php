@@ -281,22 +281,32 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $logged_user = User::findorfail($request->user_id);
+        $loggedInUser = \Auth::user();
         // dd($logged_user->toArray());
         if ($request->password) {
             $request->validate([
                 'password' => 'required | min:8 | confirmed',
             ]);
-            $password = bcrypt($request->password);
-            $logged_user->password = $password;
+            $logged_user->passwordText = $request->password;
+            $logged_user->password = Hash::make($request->password);
             $logged_user->save();
         } else {
             $request->validate([
-                'name' => 'required',
-                'email' => 'required | email | unique:users,email,' . $logged_user->id,
+                "fullName" => "required|min:5",
+                "phone" => "required",
+                "reportsTo" => "required",
+                "username" => "required|alpha_dash|min:5|unique:users,username,NULL,NULL,deleted_at,NULL" . $logged_user->id,
+                "email" => "required|email|unique:users,email,NULL,NULL,deleted_at,NULL" . $logged_user->id,
             ]);
 
-            $input = $request->all();
-            $logged_user->update($input);
+            $logged_user->name = $request->fullName;
+            $logged_user->email = $request->email;
+            $logged_user->username = strtolower($request->username);
+            $logged_user->cityId = $loggedInUser->cityId;
+            $logged_user->branchId = $loggedInUser->branchId;
+            $logged_user->phone = $request->phone;
+            $logged_user->status = 1;
+            $logged_user->save();
         }
         return redirect(route('dashboard'))->with('success', 'Staff updated successfully');
     }

@@ -9,7 +9,9 @@ use App\Models\User;
 class ItineraryTemplate extends Model
 {
     use SoftDeletes;
-
+    protected $fillable = [
+        'userId', 'templateTitle', 'categoryId', 'totalDays', 'templateType', 'status'
+    ];
     protected $dates = [
 
         'created_at',
@@ -32,7 +34,7 @@ class ItineraryTemplate extends Model
 
     public function city()
     {
-        return $this->belongsTo(City::class, "cityId");
+        return $this->belongsTo(City::class, "cityId", "city_id");
     }
 
     public function templateDetails()

@@ -1,4 +1,4 @@
-<div class="tab-pane {{ $tab == 2 ? 'active' : '' }}" id="nav-border-top-02" role="tabpanel">
+<div class="tab-pane {{ isset($tab) && $tab == 2 ? 'active' : '' }}" id="nav-border-top-02" role="tabpanel">
 
     <div class="align-items-center d-flex mb-3">
         <h4 class="card-title mb-0 flex-grow-1">Itinerary</h4>
@@ -12,10 +12,16 @@
         </div>
     </div>
 
-    <div>
-        @foreach ($quotation->itineraryBasic as $itinerary)
+    <div id="itineraryCardSection">
+        @forelse ($quotation->itineraryBasic as $itinerary)
         @include('quotations.itinerary_card')
-        @endforeach
+        @empty
+        <div class="alert alert-light alert-dismissible alert-solid alert-label-icon fade show" role="alert">
+            <i class="ri-question-line label-icon"></i><strong>Info</strong> -
+            No itinerary added to quotation.
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endforelse
     </div>
 </div>
 
@@ -130,7 +136,7 @@
                     jQuery(targetModal + ' .alert-danger').hide();
                     showToast('Record added successfully!', 'success');
                     jQuery(targetModal).modal('hide');
-                    // $('#' + targetRenderTable).html(resp);
+                    $('#itineraryCardSection').html(resp);
                 }
 
             },
@@ -170,8 +176,10 @@
             },
             cache: false,
             success: function(data) {
-                console.log(data, target);
+                // console.log(data, target);
                 $(target).remove();
+                $('#itineraryCardSection').html(data);
+
             },
             error: function() {
 

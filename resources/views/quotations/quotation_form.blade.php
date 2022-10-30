@@ -8,7 +8,7 @@
             <div class="card-header align-items-center d-flex">
                 <h4 class="card-title mb-0 flex-grow-1">Create Quotation</h4>
 
-                @if($quotation)
+                @if(isset($quotation))
                 <div class="flex-shrink-0">
                     <a href="https://travelpakistani.com/quotation/{{ $quotation->liveQuotation }}" class="btn btn-success btn-label btn-sm">
                         <i class="ri-file-list-3-line label-icon align-middle fs-16 me-2"></i> View Quotation
@@ -20,67 +20,36 @@
                 @endif
             </div>
             <div class="card-body">
-                <!-- <ul class="nav nav-tabs nav-border-top nav-border-top-primary mb-3" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link {{ $tab == 1 ? 'active' : '' }}" data-bs-toggle="tab" href="#nav-border-top-01" role="tab" aria-selected="true">
-                                Basic Details 
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ $tab == 2 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" data-bs-toggle="tab" href="#nav-border-top-02" role="tab" aria-selected="false">
-                                Itinerary 
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ $tab == 3 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" data-bs-toggle="tab" href="#nav-border-top-03" role="tab" aria-selected="false">
-                                Quote
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ $tab == 4 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" data-bs-toggle="tab" href="#nav-border-top-04" role="tab" aria-selected="false">
-                                Terms & Conditions 
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ $tab == 5 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" data-bs-toggle="tab" href="#nav-border-top-05" role="tab" aria-selected="false">
-                                Photos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ $tab == 6 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" data-bs-toggle="tab" href="#nav-border-top-06" role="tab" aria-selected="false">
-                                Your Quotation
-                            </a>
-                        </li>
-                    </ul> -->
+
 
                 <ul class="nav nav-tabs nav-border-top nav-border-top-primary mb-3" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link {{ $tab == 1 ? 'active' : '' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=1">
+                        <a class="nav-link {{ isset($tab) && $tab == 1 ? 'active' : '' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=1">
                             Basic Details
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ $tab == 2 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=2">
+                        <a class="nav-link {{ isset($tab) && $tab == 2 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=2">
                             Itinerary
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ $tab == 3 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=3">
+                        <a class="nav-link {{ isset($tab) && $tab == 3 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=3">
                             Quote
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ $tab == 4 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=4">
+                        <a class="nav-link {{ isset($tab) && $tab == 4 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=4">
                             Terms & Conditions
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ $tab == 5 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=5">
+                        <a class="nav-link {{ isset($tab) && $tab == 5 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=5">
                             Photos
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ $tab == 6 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=6">
+                        <a class="nav-link {{ isset($tab) && $tab == 6 ? 'active' : '' }} {{ isset($quotation) ? '' : 'disabled' }}" href="{{ route('quotation-edit', $quotation_id); }}?tab=6">
                             Your Quotation
                         </a>
                     </li>

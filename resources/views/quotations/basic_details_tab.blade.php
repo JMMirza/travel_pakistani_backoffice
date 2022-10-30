@@ -1,4 +1,4 @@
-<div class="tab-pane {{ $tab == 1 ? 'active' : '' }}" id="nav-border-top-01" role="tabpanel">
+<div class="tab-pane {{ isset($tab) && $tab == 1 ? 'active' : '' }}" id="nav-border-top-01" role="tabpanel">
     <form class="row  needs-validation row g-3" action="{{ route('quotation-store') }}" method="POST" enctype='multipart/form-data' novalidate>
         @csrf
         <input type="hidden" id="quoteStatus" name="quoteStatus" value="8">
@@ -38,7 +38,7 @@
             <select class="form-control" id="cityId" placeholder="Select city" name="cityId" required>
                 <option value="">Please select</option>
                 @foreach ($cities as $city)
-                <option value="{{ $city->city_id }}" {{ $city->city_id == $quotation->cityId ? 'selected' : '' }}>{{ $city->title }}</option>
+                <option value="{{ $city->city_id }}" {{ isset($quotation) && $city->city_id == $quotation->cityId ? 'selected' : '' }}>{{ $city->title }}</option>
                 @endforeach
             </select>
         </div>
@@ -64,7 +64,7 @@
             <label for="citiesToVisit" class="form-label">Cities to Visit <span class="text-danger">*</span></label>
             <select class="form-control" id="citiesToVisit" placeholder="Select cities" name="citiesToVisit[]" multiple required>
                 @foreach ($cities as $city)
-                <option {{ isset($quotation) && in_array($city->city_id, json_decode($quotation->citiesToVisit)) ? 'selected' : '' }} value="{{ $city->city_id }}">{{ $city->title }}</option>
+                <option {{ isset($quotation) && in_array($city->city_id, ($quotation->citiesToVisit ? json_decode($quotation->citiesToVisit) : [])) ? 'selected' : '' }} value="{{ $city->city_id }}">{{ $city->title }}</option>
                 @endforeach
             </select>
         </div>
@@ -89,11 +89,11 @@
         <div class="col-md-12">
             <label for="processedBy" class="form-label">Apply Markup <span class="text-danger">*</span></label>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="markupType" id="Individual" value="Individual" {{ isset($quotation) && $quotation->markupType == 'Individual' ? 'checked' : '' }}>
+                <input class="form-check-input" type="radio" name="markupType" id="Individual" value="Individual" {{ isset($quotation) && $quotation->markupType == 'Individual' ? 'checked' : '' }} {{ !isset($quotation) || $quotation->markupType == '' ? 'checked' : '' }} required>
                 <label class="form-check-label" for="Individual">Individual Item</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="markupType" id="Total" value="Total" {{ isset($quotation) && $quotation->markupType == 'Total' ? 'checked' : '' }}>
+                <input class="form-check-input" type="radio" name="markupType" id="Total" value="Total" {{ isset($quotation) && $quotation->markupType == 'Total' ? 'checked' : '' }} required>
                 <label class="form-check-label" for="Total">Total</label>
             </div>
         </div>
