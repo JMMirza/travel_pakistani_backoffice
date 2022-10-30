@@ -17,13 +17,14 @@
                         action="{{ route('staffs.update', $user_info->id) }}">
                         @csrf
                         @method('PATCH')
+                        <input type="hidden" name="user_id" value="{{ $user_info->user->id }}">
                         <div class="col-md-6 col-sm-12">
                             <div class="form-label-group in-border">
                                 <label for="fullName" class="form-label">Full Name <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="fullName" name="fullName"
                                     placeholder="Please enter "
-                                    value="{{ isset($user_info) ? $user_info->name : old('fullName') }}" required>
+                                    value="{{ isset($user_info) ? $user_info->user->name : old('fullName') }}" required>
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('fullName'))
                                         {{ $errors->first('fullName') }}
@@ -41,7 +42,7 @@
                                 <input type="email"
                                     class="form-control @if ($errors->has('email')) is-invalid @endif "
                                     id="investorEmail" name="email" placeholder="Please enter "
-                                    value="{{ isset($user_info) ? $user_info->email : old('email') }}" required>
+                                    value="{{ isset($user_info) ? $user_info->user->email : old('email') }}" required>
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('email'))
                                         {{ $errors->first('email') }}
@@ -58,7 +59,7 @@
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="username" name="username"
                                     placeholder="Please enter "
-                                    value="{{ isset($user_info) ? $user_info->username : old('username') }}" required>
+                                    value="{{ isset($user_info) ? $user_info->user->username : old('username') }}" required>
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('username'))
                                         {{ $errors->first('username') }}
@@ -74,7 +75,7 @@
                                 <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="phone" name="phone"
                                     placeholder="Please enter "
-                                    value="{{ isset($user_info) ? $user_info->phone : old('phone') }}" required>
+                                    value="{{ isset($user_info) ? $user_info->user->phone : old('phone') }}" required>
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('phone'))
                                         {{ $errors->first('phone') }}
@@ -106,7 +107,7 @@
                                     @if ($errors->has('reportsTo'))
                                         {{ $errors->first('reportsTo') }}
                                     @else
-                                        Select the City!
+                                        Select the User!
                                     @endif
                                 </div>
                             </div>
@@ -148,7 +149,7 @@
                         action="{{ route('staffs.update', $user_info->id) }}">
                         @csrf
                         @method('PATCH')
-                        <input type="hidden" name="user_id" value="{{ $user_info->id }}">
+                        <input type="hidden" name="user_id" value="{{ $user_info->user->id }}">
                         <div class="col-md-6 col-sm-12">
                             <div class="form-label-group in-border">
                                 <label for="investorPassword" class="form-label">New Password <span

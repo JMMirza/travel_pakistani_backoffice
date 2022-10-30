@@ -3555,8 +3555,10 @@ class QuotationController extends Controller
 
     public function getQuotationChat($id)
     {
-        $quotationsChat = QuotationChat::where('quotationId', $id)->orderBy("id", "desc")->get();
-        return view('quotations.quotation_response_chat', ['chat' => $quotationsChat, 'quotationId' => $id]);
+        $quotationsChat = QuotationChat::where('quotationId', $id)->orderBy("id", "asc")->get();
+        $quotation = Quotation::findOrFail($id);
+        // dd($quotationsChat->toArray());
+        return view('quotations.quotation_response_chat', ['chat' => $quotationsChat, 'quotationId' => $id, 'quotation' => $quotation]);
     }
 
     public function submitQuotationChat(Request $request)

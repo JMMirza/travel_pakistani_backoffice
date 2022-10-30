@@ -19,6 +19,6 @@ class Staff extends Model
     }
     public function reportsToUser()
     {
-        return $this->belongsTo(User::class, "reportsTo");
+        return $this->belongsTo(User::class, "reportsTo", 'id');
     }
 }

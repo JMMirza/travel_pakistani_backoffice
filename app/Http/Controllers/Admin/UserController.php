@@ -252,12 +252,12 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = \Auth::user();
-        $user_info = User::where('id', $id)->first();
-        $user = User::with('userable.staff.user')->where('id', $user->id)->first();
-
+        $user_info = Staff::with(['user', 'reportsToUser'])->where('id', $id)->first();
+        $users = User::with('userable.staff.user')->where('id', $user->id)->first();
+        // dd($user_info->toArray());
         $data = [
             'user_info' => $user_info,
-            'user' => $user,
+            'user' => $users,
         ];
 
         return view('staffs.edit_profile', $data);
@@ -300,7 +300,7 @@ class UserController extends Controller
             $logged_user->status = 1;
             $logged_user->save();
         }
-        return redirect(route('dashboard'))->with('success', 'Staff updated successfully');
+        return redirect()->route('staffs.index')->with('success', 'Staff updated successfully');
     }
 
     public function uploadCropImage(Request $request)
