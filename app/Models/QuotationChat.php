@@ -9,6 +9,6 @@ class QuotationChat extends Model
 
     public function quotation()
     {
-        return $this->belongsTo(Quotation::class, 'quotationId');
+        return $this->belongsTo(Quotation::class, 'quotationId', 'id');
     }
 }
