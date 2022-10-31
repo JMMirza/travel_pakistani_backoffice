@@ -10,6 +10,7 @@ use App\Models\City;
 use App\Models\HotelQuotation;
 use App\Models\ServiceQuotation;
 use App\Models\QuotationNote;
+use App\Models\QuotationStatusLog;
 use App\Models\QuotationImage;
 use App\Models\QuotationInvoice;
 use App\Models\QuotationResponse;
@@ -50,9 +51,9 @@ class QuotationController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $status = QuotationStatus::all();
 
         if ($request->ajax()) {
-
 
             if ($user->userable_type == "Admin") {
                 $quotations = Quotation::whereNull("quotationParent")
@@ -91,12 +92,24 @@ class QuotationController extends Controller
 
                     return 'N/A';
                 })
-                ->addColumn('status', function ($row) {
+                ->addColumn('status', function ($row) use ($status) {
 
-                    if ($row->statusDetail) {
-                        return '<span class="badge ' . $row->statusDetail->cssClass . ' text-uppercase">' . $row->statusDetail->label . '</span>';
-                    } else {
+                    $statuses = '';
+
+                    $statuses .= '<select class="form-select form-select-sm quotation-status" data-quotation-id="' . $row->id . '">';
+
+                    $selected = '';
+                    foreach ($status as $key => $s) {
+                        $selected = $row->status == $s->id || $row->status == $s->label ? 'selected' : '';
+                        $statuses .= '<option ' . $selected . ' value="' . $s->id . '">' . $s->label . '</option>';
                     }
+
+                    return $statuses .= '</select>';
+
+                    // if ($row->statusDetail) {
+                    //     return '<span class="badge ' . $row->statusDetail->cssClass . ' text-uppercase">' . $row->statusDetail->label . '</span>';
+                    // } else {
+                    // }
                 })
                 ->addColumn('action', function ($row) {
 
@@ -108,7 +121,6 @@ class QuotationController extends Controller
                                 <a class="dropdown-item" href="' . route('quotation-edit', $row->id) . '?tab=1">Edit</a>
                                 <a class="dropdown-item" href="#">Invoice</a>
                                 <a class="dropdown-item" href="#">Chat</a>
-                                <a class="dropdown-item" href="#">Status</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger" href="#">Delete</a>
                             </div>
@@ -121,7 +133,6 @@ class QuotationController extends Controller
                 ->make(true);
         }
 
-        $status = QuotationStatus::all();
 
         return view('quotations.quotations_list', ['status' => $status]);
     }
@@ -134,7 +145,8 @@ class QuotationController extends Controller
             'cities' => $cities,
             'users' => $users,
             'quotation_id' => 0,
-            'tab' => $request->has('tab') ? $request->tab : 1
+            'tab' => $request->has('tab') ? $request->tab : 1,
+            'inquire_id' => $request->has('inquire_id') ? $request->inquire_id : 0
         ]);
     }
 
@@ -1188,6 +1200,36 @@ class QuotationController extends Controller
         QuotationImage::find($id)->delete();
         return response()->json(["message" => "Photo Deleted Successfully!"], 200);
     }
+
+    public function changeQuotationStatus(Request $request)
+    {
+        $user = Auth::user();
+
+        $validator = \Validator::make($request->all(), [
+            'quotationId' => 'required',
+            'statusId' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()->all()]);
+        }
+
+        $quotation = Quotation::findOrFail($request->quotationId);
+        $quotationStatus = QuotationStatus::findOrFail($request->statusId);
+
+        QuotationStatusLog::create([
+            'quotationId' => $request->quotationId,
+            'statusId' => $request->statusId,
+            'userId' => $user->id,
+        ]);
+
+        $quotation->status = $quotationStatus->label;
+        $quotation->save();
+
+        return response()->json(['data' => null], 200);
+    }
+
+
 
     //Legcy Code below
 

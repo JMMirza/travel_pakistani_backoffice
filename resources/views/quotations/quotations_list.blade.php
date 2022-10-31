@@ -159,5 +159,40 @@
             $('#quotations-table').DataTable().ajax.reload(null, false);
         }
     });
+
+    $(document).on("change", '.quotation-status', function() {
+
+        var quotationId = $(this).data('quotation-id');
+        var statusId = $(this).val();
+
+        console.log(quotationId, statusId);
+
+        $.ajax({
+
+            url: "{{ route('change-quotation-status') }}",
+            type: "POST",
+            data: {
+                quotationId,
+                statusId,
+            },
+            headers: {
+                'X-CSRF-Token': '{{ csrf_token() }}',
+            },
+            cache: false,
+            success: function(data) {
+                console.log(data);
+                showToast('Status updated successfully!', 'success');
+            },
+            error: function() {
+
+            },
+            beforeSend: function() {
+
+            },
+            complete: function() {
+
+            }
+        });
+    });
 </script>
 @endpush

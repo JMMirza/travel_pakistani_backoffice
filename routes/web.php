@@ -103,6 +103,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/remove-quotation-image/{id}', [QuotationController::class, 'deleteQuotationImage'])->name('remove-quotation-image');
 
 
+    Route::post('/change-quotation-status', [QuotationController::class, 'changeQuotationStatus'])->name('change-quotation-status');
+
+
+
+
+
+
     Route::get('/existing/update/quotations', [QuotationController::class, 'updateLiveQuotationLink']);
     Route::get('/delete/test/quotations', [QuotationController::class, 'deleteTestQuotations']);
     Route::get('/quotations/templates', [QuotationController::class, 'quotationTemplates']);
