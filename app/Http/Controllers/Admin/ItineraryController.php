@@ -177,9 +177,9 @@ class ItineraryController extends Controller
         $int_detail['pickupTime'] = $request->pickupTime;
         $int_detail['description'] = $request->description;
         //update
-        if(!empty($request->id)){
-            ItineraryTemplateDetail::where('id', $request->id)->update($int_detail);
-            $itineraryID=$request->id;
+        if(!empty($request->itineraryTemplateDetailId)){
+            ItineraryTemplateDetail::where('id', $request->itineraryTemplateDetailId)->update($int_detail);
+            $itineraryID=$request->itineraryTemplateDetailId;
             $msg = 'Template detail updated successfully.';
         }else{
             //create

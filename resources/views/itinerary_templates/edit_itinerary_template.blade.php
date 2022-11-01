@@ -127,7 +127,8 @@
                     <div class="tab-pane {{ isset($tab) && $tab == 2 ? 'active' : '' }}" id="nav-border-top-02" role="tabpanel">
                         <form class="needs-validation row g-3 mb-3" action="{{ route('save-itinerary-detail',$itinerary_template->id) }}" method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
-                            <input type="hidden" value="{{ isset($itinerary_template_details_obj->id) ? $itinerary_template_details_obj->id :''  }}" name="itineraryTemplateId" />
+                            <input type="hidden" value="{{ isset($itinerary_template_details_obj->id) ? $itinerary_template_details_obj->id :''  }}" name="itineraryTemplateDetailId" />
+                            <input type="hidden" value="{{ isset($itinerary_template->id) ? $itinerary_template->id :''  }}" name="itineraryTemplateId" />
                             <div class="col-md-4 col-sm-12">
                                 <div class="form-label-group in-border">
                                     <label for="itineraryCities" class="form-label">City</label>
@@ -148,7 +149,7 @@
                             <div class="col-md-4 col-sm-12">
                                 <div class="form-label-group in-border">
                                     <label for="pickupTime" class="form-label">Day Number</label>
-                                    <input type="number" class="form-control @if ($errors->has('dayNo')) is-invalid @endif" id="templateTitle" name="dayNo" placeholder="Please Enter" value="@if(isset($itinerary_template_details_obj->dayNo)){{$itinerary_template_details_obj->cityId}}@endif" required>
+                                    <input type="number" class="form-control @if ($errors->has('dayNo')) is-invalid @endif" id="templateTitle" name="dayNo" placeholder="Please Enter" value="@if(isset($itinerary_template_details_obj->dayNo)){{$itinerary_template_details_obj->dayNo}}@endif" required>
                                     <div class="invalid-feedback">
                                         @if ($errors->has('dayNo'))
                                         {{ $errors->first('dayNo') }}
