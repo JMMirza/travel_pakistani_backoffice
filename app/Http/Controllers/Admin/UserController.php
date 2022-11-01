@@ -205,6 +205,7 @@ class UserController extends Controller
         $user->credits = env("OPERATOR_CREDITS_FREE");
 
         if ($request->hasFile("photo")) {
+            // dd($request->all());
             $imgOptions = ['folder' => 'guide_profile', 'format' => 'webp'];
             $cloudder = Cloudder::upload($request->file('photo')->getRealPath(), null, $imgOptions);
             $result = $cloudder->getResult();
@@ -296,6 +297,7 @@ class UserController extends Controller
             $logged_user->save();
         }
         if ($request->hasFile("photo")) {
+            // dd($request->all());
             $imgOptions = ['folder' => 'guide_profile', 'format' => 'webp'];
             $cloudder = Cloudder::upload($request->file('photo')->getRealPath(), null, $imgOptions);
             $result = $cloudder->getResult();

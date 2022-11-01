@@ -14,7 +14,7 @@
                 </div>
                 <div class="card-body">
                     <form class="row g-3 needs-validation" id="projectsDetailsForm" novalidate method="POST"
-                        action="{{ route('staffs.update', $user_info->id) }}">
+                        enctype='multipart/form-data' action="{{ route('staffs.update', $user_info->id) }}">
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="user_id" value="{{ $user_info->user->id }}">
@@ -113,7 +113,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6 col-sm-12 mb-3">
+                        <div class="col-md-5 col-sm-12 mb-3">
                             <div class="form-label-group in-border">
                                 <label for="photo" class="form-label">Image</label>
                                 <input type="file"
@@ -128,6 +128,15 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-1 col-sm-12">
+                            <a href="javascript:void(0);" class="preview-img"
+                                data-url="{{ isset($user_info) ? $user_info->user->profile_image_url : old('photo') }}"><img
+                                    class="rounded avatar-xs header-profile-user mt-4"
+                                    src="{{ isset($user_info) ? $user_info->user->profile_image_url : old('photo') }}"
+                                    alt="Header Avatar"></a>
+                        </div>
+
                         <div class="col-12 text-end">
                             <button class="btn btn-primary" type="submit">Update Record</button>
                             <a href="{{ route('dashboard') }}"

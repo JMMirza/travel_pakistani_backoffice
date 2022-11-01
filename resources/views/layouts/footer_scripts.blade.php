@@ -91,6 +91,13 @@
         });
     });
 
+    $(document).on('click', '.preview-img', function(e) {
+        e.preventDefault();
+        let path = $(this).data('url');
+        $(".img_path").attr("src", path);
+        $('#domicile-modal').modal('show');
+    });
+
     $(document).on('click', '.show-modal', function(e) {
 
         e.preventDefault();
