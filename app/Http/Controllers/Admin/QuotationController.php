@@ -188,11 +188,19 @@ class QuotationController extends Controller
 
             $quotationPrevious = Quotation::find($quotationId);
             $totalVersions = Quotation::where("quotationParent", $quotationId)->count();
-            $quotationData['version'] = $totalVersions + 1;
+            $quotationData['versionNo'] = $totalVersions + 1;
+            $quotationData['status'] = 4;
             $quotationData['quotationParent'] = $quotationPrevious->quotationParent > 0 ? $quotationPrevious->quotationParent : $quotationId;
             $quotation = Quotation::create($quotationData);
 
             if ($quotation) {
+
+                QuotationStatusLog::create([
+                    'quotationId' => $quotation->id,
+                    'statusId' => 4,
+                    'userId' => $user->id,
+                ]);
+
                 if ($quotationPrevious->itineraryBasic) {
                     $quotationPrevious->itineraryBasic->map(function ($row, $key) use ($quotation) {
                         $row->quotationId = $quotation->id;
@@ -240,7 +248,16 @@ class QuotationController extends Controller
             $quotation = Quotation::find($quotationId);
             $quotation->update($quotationData);
         } else {
+            $quotationData['versionNo'] = 1;
             $quotation = Quotation::create($quotationData);
+            $quotation->quotationParent = $quotation->id;
+            $quotation->save();
+
+            QuotationStatusLog::create([
+                'quotationId' => $quotation->id,
+                'statusId' => 4,
+                'userId' => $user->id,
+            ]);
         }
 
         if ($quotation && empty($quotation->liveQuotation)) {
@@ -256,6 +273,7 @@ class QuotationController extends Controller
     {
         $cities = City::all();
         $users = User::all();
+        $status = QuotationStatus::all();
 
         $quotation = Quotation::where(['id' => $id])->with([
             "user",
@@ -305,6 +323,11 @@ class QuotationController extends Controller
             $discountedAmount = $finalAmount - $quotation->discountValue;
         }
 
+        $quotationParent = !empty($quotation->quotationParent) ? $quotation->quotationParent : $quotation->id;
+        $versions = Quotation::select('id', 'versionNo')->where(['quotationParent' => $quotationParent])->get();
+
+        // dd($versions);
+
         return view('quotations.quotation_form', [
             'cities' => $cities,
             'users' => $users,
@@ -317,6 +340,8 @@ class QuotationController extends Controller
             'finalAmount' => $finalAmount,
             'discountedAmount' => $discountedAmount,
             'totalPersons' => ($quotation->adults + $quotation->children),
+            'status' => $status,
+            'versions' => $versions,
 
         ]);
     }
@@ -1229,7 +1254,9 @@ class QuotationController extends Controller
         return response()->json(['data' => null], 200);
     }
 
-
+    public function quotationInvoice(Request $request)
+    {
+    }
 
     //Legcy Code below
 
