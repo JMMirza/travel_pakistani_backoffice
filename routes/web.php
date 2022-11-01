@@ -50,7 +50,7 @@ Route::group(['middleware' => ['auth']], function () {
     //Rehman
     Route::post('save-itinerary-detail', [ItineraryController::class, 'saveItineraryDetail'])->name('save-itinerary-detail');
     Route::get('/edit-itinerary-templates-detail/{id}', [ItineraryController::class, 'EditItineraryTemplateDetail'])->name('edit-itinerary-templates-detail');
-    Route::delete('/delete-itinerary-templates-detail/{id}', [ItineraryController::class, 'DeleteItineraryTemplateDetail'])->name('delete-itinerary-templates-detail');
+    Route::get('/delete-itinerary-templates-detail/{id}', [ItineraryController::class, 'DeleteItineraryTemplateDetail'])->name('delete-itinerary-templates-detail');
 
     //Rehman
     Route::get('profile', [CommonController::class, 'profile'])->name('profile');

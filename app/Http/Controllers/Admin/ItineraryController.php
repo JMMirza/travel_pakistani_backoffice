@@ -204,7 +204,7 @@ class ItineraryController extends Controller
 
             $itinerary_update = ItineraryTemplateDetail::where('id', $itineraryID)->update(['photo' => $imgName]);
         }
-        return redirect()->route('itinerary-templates.index')
+        return redirect()->back()
             ->with('success', $msg);
     }
     public function update(Request $request, $id)
@@ -251,7 +251,8 @@ class ItineraryController extends Controller
 
         $templateDetail = ItineraryTemplateDetail::findOrFail($id);
         try {
-            return $templateDetail->delete();
+             $templateDetail->delete();
+             return redirect()->back()->with('success','Record deleted successfully');
         } catch (QueryException $e) {
             print_r($e->errorInfo);
         }
