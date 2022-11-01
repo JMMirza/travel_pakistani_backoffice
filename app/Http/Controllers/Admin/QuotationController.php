@@ -185,65 +185,18 @@ class QuotationController extends Controller
         }
 
         if ($isNew == 1 && $quotationId > 0) {
-
             $quotationPrevious = Quotation::find($quotationId);
+
             $totalVersions = Quotation::where("quotationParent", $quotationId)->count();
+            $quotationData['requiredServices'] = $quotationPrevious->requiredServices;
+            $quotationData['userNotes'] = $quotationPrevious->userNotes;
+
             $quotationData['versionNo'] = $totalVersions + 1;
             $quotationData['status'] = 4;
             $quotationData['quotationParent'] = $quotationPrevious->quotationParent > 0 ? $quotationPrevious->quotationParent : $quotationId;
             $quotation = Quotation::create($quotationData);
 
-            if ($quotation) {
-
-                QuotationStatusLog::create([
-                    'quotationId' => $quotation->id,
-                    'statusId' => 4,
-                    'userId' => $user->id,
-                ]);
-
-                if ($quotationPrevious->itineraryBasic) {
-                    $quotationPrevious->itineraryBasic->map(function ($row, $key) use ($quotation) {
-                        $row->quotationId = $quotation->id;
-                        $quotation->itineraryBasic()->create($row->toArray());
-                    });
-                }
-
-                $hotelQuotations = HotelQuotation::where('quotationId', $quotationId)->get();
-
-                if ($hotelQuotations) {
-                    $hotelQuotations->map(function ($row, $key) use ($quotation) {
-                        $row->quotationId = $quotation->id;
-                        HotelQuotation::create($row->toArray());
-                    });
-                }
-
-                $serviceQuotations = ServiceQuotation::where('quotationId', $quotationId)->get();
-
-                if ($serviceQuotations) {
-                    $serviceQuotations->map(function ($row, $key) use ($quotation) {
-                        $row->quotationId = $quotation->id;
-                        ServiceQuotation::create($row->toArray());
-                    });
-                }
-
-                $quotationNotes = QuotationNote::where('quotationId', $quotationId)->get();
-
-                if ($quotationNotes) {
-                    $quotationNotes->map(function ($row, $key) use ($quotation) {
-                        $row->quotationId = $quotation->id;
-                        QuotationNote::create($row->toArray());
-                    });
-                }
-
-                $quotationImages = QuotationImage::where('quotationId', $quotationId)->get();
-
-                if ($quotationImages) {
-                    $quotationImages->map(function ($row, $key) use ($quotation) {
-                        $row->quotationId = $quotation->id;
-                        QuotationImage::create($row->toArray());
-                    });
-                }
-            }
+            $quotationPrevious->copyQuotationData($quotation);
         } else if ($isNew == 0 && $quotationId > 0) {
             $quotation = Quotation::find($quotationId);
             $quotation->update($quotationData);
@@ -336,9 +289,11 @@ class QuotationController extends Controller
             'services' => json_decode($quotation->requiredServices),
             'userNotes' => json_decode($quotation->userNotes),
             'tab' => isset($request->tab) ? $request->tab : 1,
+
             'totalCost' => $totalCost,
             'finalAmount' => $finalAmount,
             'discountedAmount' => $discountedAmount,
+
             'totalPersons' => ($quotation->adults + $quotation->children),
             'status' => $status,
             'versions' => $versions,
@@ -1254,8 +1209,9 @@ class QuotationController extends Controller
         return response()->json(['data' => null], 200);
     }
 
-    public function quotationInvoice(Request $request)
+    public function saveQuotationInvoice(Request $request)
     {
+        dd($request->all());
     }
 
     //Legcy Code below
