@@ -3,6 +3,7 @@
         @csrf
         <input type="hidden" id="quoteStatus" name="quoteStatus" value="8">
         <input type="hidden" id="quotationId" name="quotationId" value="{{ isset($quotation) ? $quotation->id : 0 }}">
+        <input type="hidden" id="inquiryId" name="inquiryId" value="{{ isset($inquire_id) ? $inquire_id : 0 }}">
 
         @if(isset($quotation) && $quotation->id > 0)
         <div class="col-md-12">

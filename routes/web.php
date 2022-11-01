@@ -96,6 +96,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/save-quotation-activity', [QuotationController::class, 'saveQuotationActivity'])->name('save-quotation-activity');
     Route::post('/save-quotation-policy', [QuotationController::class, 'saveQuotationPolicy'])->name('save-quotation-policy');
     Route::post('/save-quotation', [QuotationController::class, 'saveQuotation'])->name('save-quotation');
+    Route::post('/save-quotation-invoice', [QuotationController::class, 'saveQuotationInvoice'])->name('save-quotation-invoice');
 
     Route::post('/save-quotation-service-types', [QuotationController::class, 'saveQuotationServiceTypes'])->name('save-quotation-service-types');
     Route::post('/save-quotation-notes', [QuotationController::class, 'saveQuotationNotesTypes'])->name('save-quotation-notes');
@@ -107,6 +108,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/remove-quotation-service/{id}', [QuotationController::class, 'deleteQuotationService'])->name('remove-quotation-service');
     Route::delete('/remove-quotation-note/{id}', [QuotationController::class, 'deleteQuotationNote'])->name('remove-quotation-note');
     Route::delete('/remove-quotation-image/{id}', [QuotationController::class, 'deleteQuotationImage'])->name('remove-quotation-image');
+
+
+    Route::post('/change-quotation-status', [QuotationController::class, 'changeQuotationStatus'])->name('change-quotation-status');
+
+
+
+
 
 
     Route::get('/existing/update/quotations', [QuotationController::class, 'updateLiveQuotationLink']);

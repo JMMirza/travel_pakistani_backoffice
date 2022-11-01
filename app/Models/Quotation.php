@@ -5,6 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
+use App\Models\HotelQuotation;
+use App\Models\ServiceQuotation;
+use App\Models\QuotationNote;
+use App\Models\QuotationStatusLog;
+use App\Models\QuotationImage;
+use Auth;
 
 class Quotation extends Model
 {
@@ -188,5 +194,68 @@ class Quotation extends Model
     public function statusDetail()
     {
         return $this->hasOne(QuotationStatus::class, "id", "status");
+    }
+
+    public function copyQuotationData($quotation)
+    {
+        $user = Auth::user();
+
+        $quotationPrevious = Quotation::find($this->id);
+        $quotationId = $quotationPrevious->id;
+        // $quotation = $this;
+
+        if ($quotation) {
+
+            QuotationStatusLog::create([
+                'quotationId' => $quotation->id,
+                'statusId' => 4,
+                'userId' => $user->id,
+            ]);
+
+            if ($quotationPrevious->itineraryBasic) {
+                $quotationPrevious->itineraryBasic->map(function ($row, $key) use ($quotation) {
+                    $row->quotationId = $quotation->id;
+                    $quotation->itineraryBasic()->create($row->toArray());
+                });
+            }
+
+            $hotelQuotations = HotelQuotation::where('quotationId', $quotationId)->get();
+
+            if ($hotelQuotations) {
+                $hotelQuotations->map(function ($row, $key) use ($quotation) {
+                    $row->quotationId = $quotation->id;
+                    HotelQuotation::create($row->toArray());
+                });
+            }
+
+            $serviceQuotations = ServiceQuotation::where('quotationId', $quotationId)->get();
+
+            if ($serviceQuotations) {
+                $serviceQuotations->map(function ($row, $key) use ($quotation) {
+                    $row->quotationId = $quotation->id;
+                    ServiceQuotation::create($row->toArray());
+                });
+            }
+
+            $quotationNotes = QuotationNote::where('quotationId', $quotationId)->get();
+
+            if ($quotationNotes) {
+                $quotationNotes->map(function ($row, $key) use ($quotation) {
+                    $row->quotationId = $quotation->id;
+                    QuotationNote::create($row->toArray());
+                });
+            }
+
+            $quotationImages = QuotationImage::where('quotationId', $quotationId)->get();
+
+            if ($quotationImages) {
+                $quotationImages->map(function ($row, $key) use ($quotation) {
+                    $row->quotationId = $quotation->id;
+                    QuotationImage::create($row->toArray());
+                });
+            }
+
+            // exit;
+        }
     }
 }

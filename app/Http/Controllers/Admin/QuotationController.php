@@ -10,6 +10,7 @@ use App\Models\City;
 use App\Models\HotelQuotation;
 use App\Models\ServiceQuotation;
 use App\Models\QuotationNote;
+use App\Models\QuotationStatusLog;
 use App\Models\QuotationImage;
 use App\Models\QuotationInvoice;
 use App\Models\QuotationResponse;
@@ -50,9 +51,9 @@ class QuotationController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $status = QuotationStatus::all();
 
         if ($request->ajax()) {
-
 
             if ($user->userable_type == "Admin") {
                 $quotations = Quotation::whereNull("quotationParent")
@@ -91,12 +92,24 @@ class QuotationController extends Controller
 
                     return 'N/A';
                 })
-                ->addColumn('status', function ($row) {
+                ->addColumn('status', function ($row) use ($status) {
 
-                    if ($row->statusDetail) {
-                        return '<span class="badge ' . $row->statusDetail->cssClass . ' text-uppercase">' . $row->statusDetail->label . '</span>';
-                    } else {
+                    $statuses = '';
+
+                    $statuses .= '<select class="form-select form-select-sm quotation-status" data-quotation-id="' . $row->id . '">';
+
+                    $selected = '';
+                    foreach ($status as $key => $s) {
+                        $selected = $row->status == $s->id || $row->status == $s->label ? 'selected' : '';
+                        $statuses .= '<option ' . $selected . ' value="' . $s->id . '">' . $s->label . '</option>';
                     }
+
+                    return $statuses .= '</select>';
+
+                    // if ($row->statusDetail) {
+                    //     return '<span class="badge ' . $row->statusDetail->cssClass . ' text-uppercase">' . $row->statusDetail->label . '</span>';
+                    // } else {
+                    // }
                 })
                 ->addColumn('action', function ($row) {
 
@@ -108,7 +121,6 @@ class QuotationController extends Controller
                                 <a class="dropdown-item" href="' . route('quotation-edit', $row->id) . '?tab=1">Edit</a>
                                 <a class="dropdown-item" href="#">Invoice</a>
                                 <a class="dropdown-item" href="#">Chat</a>
-                                <a class="dropdown-item" href="#">Status</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger" href="#">Delete</a>
                             </div>
@@ -121,7 +133,6 @@ class QuotationController extends Controller
                 ->make(true);
         }
 
-        $status = QuotationStatus::all();
 
         return view('quotations.quotations_list', ['status' => $status]);
     }
@@ -134,7 +145,8 @@ class QuotationController extends Controller
             'cities' => $cities,
             'users' => $users,
             'quotation_id' => 0,
-            'tab' => $request->has('tab') ? $request->tab : 1
+            'tab' => $request->has('tab') ? $request->tab : 1,
+            'inquire_id' => $request->has('inquire_id') ? $request->inquire_id : 0
         ]);
     }
 
@@ -173,62 +185,32 @@ class QuotationController extends Controller
         }
 
         if ($isNew == 1 && $quotationId > 0) {
-
             $quotationPrevious = Quotation::find($quotationId);
+
             $totalVersions = Quotation::where("quotationParent", $quotationId)->count();
-            $quotationData['version'] = $totalVersions + 1;
+            $quotationData['requiredServices'] = $quotationPrevious->requiredServices;
+            $quotationData['userNotes'] = $quotationPrevious->userNotes;
+
+            $quotationData['versionNo'] = $totalVersions + 1;
+            $quotationData['status'] = 4;
             $quotationData['quotationParent'] = $quotationPrevious->quotationParent > 0 ? $quotationPrevious->quotationParent : $quotationId;
             $quotation = Quotation::create($quotationData);
 
-            if ($quotation) {
-                if ($quotationPrevious->itineraryBasic) {
-                    $quotationPrevious->itineraryBasic->map(function ($row, $key) use ($quotation) {
-                        $row->quotationId = $quotation->id;
-                        $quotation->itineraryBasic()->create($row->toArray());
-                    });
-                }
-
-                $hotelQuotations = HotelQuotation::where('quotationId', $quotationId)->get();
-
-                if ($hotelQuotations) {
-                    $hotelQuotations->map(function ($row, $key) use ($quotation) {
-                        $row->quotationId = $quotation->id;
-                        HotelQuotation::create($row->toArray());
-                    });
-                }
-
-                $serviceQuotations = ServiceQuotation::where('quotationId', $quotationId)->get();
-
-                if ($serviceQuotations) {
-                    $serviceQuotations->map(function ($row, $key) use ($quotation) {
-                        $row->quotationId = $quotation->id;
-                        ServiceQuotation::create($row->toArray());
-                    });
-                }
-
-                $quotationNotes = QuotationNote::where('quotationId', $quotationId)->get();
-
-                if ($quotationNotes) {
-                    $quotationNotes->map(function ($row, $key) use ($quotation) {
-                        $row->quotationId = $quotation->id;
-                        QuotationNote::create($row->toArray());
-                    });
-                }
-
-                $quotationImages = QuotationImage::where('quotationId', $quotationId)->get();
-
-                if ($quotationImages) {
-                    $quotationImages->map(function ($row, $key) use ($quotation) {
-                        $row->quotationId = $quotation->id;
-                        QuotationImage::create($row->toArray());
-                    });
-                }
-            }
+            $quotationPrevious->copyQuotationData($quotation);
         } else if ($isNew == 0 && $quotationId > 0) {
             $quotation = Quotation::find($quotationId);
             $quotation->update($quotationData);
         } else {
+            $quotationData['versionNo'] = 1;
             $quotation = Quotation::create($quotationData);
+            $quotation->quotationParent = $quotation->id;
+            $quotation->save();
+
+            QuotationStatusLog::create([
+                'quotationId' => $quotation->id,
+                'statusId' => 4,
+                'userId' => $user->id,
+            ]);
         }
 
         if ($quotation && empty($quotation->liveQuotation)) {
@@ -244,6 +226,7 @@ class QuotationController extends Controller
     {
         $cities = City::all();
         $users = User::all();
+        $status = QuotationStatus::all();
 
         $quotation = Quotation::where(['id' => $id])->with([
             "user",
@@ -293,6 +276,11 @@ class QuotationController extends Controller
             $discountedAmount = $finalAmount - $quotation->discountValue;
         }
 
+        $quotationParent = !empty($quotation->quotationParent) ? $quotation->quotationParent : $quotation->id;
+        $versions = Quotation::select('id', 'versionNo')->where(['quotationParent' => $quotationParent])->get();
+
+        // dd($versions);
+
         return view('quotations.quotation_form', [
             'cities' => $cities,
             'users' => $users,
@@ -301,10 +289,14 @@ class QuotationController extends Controller
             'services' => json_decode($quotation->requiredServices),
             'userNotes' => json_decode($quotation->userNotes),
             'tab' => isset($request->tab) ? $request->tab : 1,
+
             'totalCost' => $totalCost,
             'finalAmount' => $finalAmount,
             'discountedAmount' => $discountedAmount,
+
             'totalPersons' => ($quotation->adults + $quotation->children),
+            'status' => $status,
+            'versions' => $versions,
 
         ]);
     }
@@ -1187,6 +1179,39 @@ class QuotationController extends Controller
     {
         QuotationImage::find($id)->delete();
         return response()->json(["message" => "Photo Deleted Successfully!"], 200);
+    }
+
+    public function changeQuotationStatus(Request $request)
+    {
+        $user = Auth::user();
+
+        $validator = \Validator::make($request->all(), [
+            'quotationId' => 'required',
+            'statusId' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()->all()]);
+        }
+
+        $quotation = Quotation::findOrFail($request->quotationId);
+        $quotationStatus = QuotationStatus::findOrFail($request->statusId);
+
+        QuotationStatusLog::create([
+            'quotationId' => $request->quotationId,
+            'statusId' => $request->statusId,
+            'userId' => $user->id,
+        ]);
+
+        $quotation->status = $quotationStatus->label;
+        $quotation->save();
+
+        return response()->json(['data' => null], 200);
+    }
+
+    public function saveQuotationInvoice(Request $request)
+    {
+        dd($request->all());
     }
 
     //Legcy Code below
