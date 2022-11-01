@@ -37,14 +37,10 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-
-
         $user = \Auth::user();
 
         // $user = User::with('userable.staff.user')->where('id', $user->id)->first();
-        // $data = $user->userable->staff;
-
-        // dd($data);
+        // dd($user->userable->staff->toArray());
 
         if ($request->ajax()) {
 
@@ -56,7 +52,7 @@ class UserController extends Controller
                 ->addColumn('action', function ($row) {
                     // if(isset($row->employee->id)){
                     $actionBtn = '
-                        <a href="' . route('staff-profile', $row->user->id) . '" class="btn btn-sm btn-success btn-icon waves-effect waves-light"><i class="mdi mdi-lead-pencil"></i></a>';
+                        <a href="' . route('staff-profile', $row->id) . '" class="btn btn-sm btn-success btn-icon waves-effect waves-light"><i class="mdi mdi-lead-pencil"></i></a>';
                     return $actionBtn;
                 })
                 ->rawColumns(['action'])
@@ -190,12 +186,8 @@ class UserController extends Controller
             $staffable = User::find($loggedInUser->id);
         }
 
-        // dd($staffable);
-
         $staff->reportsTo = $request->reportsTo;
         $staffable->staff()->save($staff);
-
-
 
         $user = new User();
         $user->name = $request->fullName;
@@ -260,12 +252,12 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = \Auth::user();
-        $user_info = User::where('id', $id)->first();
-        $user = User::with('userable.staff.user')->where('id', $user->id)->first();
-
+        $user_info = Staff::with(['user', 'reportsToUser'])->where('id', $id)->first();
+        $users = User::with('userable.staff.user')->where('id', $user->id)->first();
+        // dd($user_info->toArray());
         $data = [
             'user_info' => $user_info,
-            'user' => $user,
+            'user' => $users,
         ];
 
         return view('staffs.edit_profile', $data);
@@ -281,24 +273,34 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $logged_user = User::findorfail($request->user_id);
+        $loggedInUser = \Auth::user();
         // dd($logged_user->toArray());
         if ($request->password) {
             $request->validate([
                 'password' => 'required | min:8 | confirmed',
             ]);
-            $password = bcrypt($request->password);
-            $logged_user->password = $password;
+            $logged_user->passwordText = $request->password;
+            $logged_user->password = Hash::make($request->password);
             $logged_user->save();
         } else {
             $request->validate([
-                'name' => 'required',
-                'email' => 'required | email | unique:users,email,' . $logged_user->id,
+                "fullName" => "required|min:5",
+                "phone" => "required",
+                "reportsTo" => "required",
+                "username" => "required|alpha_dash|min:5|unique:users,username,NULL,NULL,deleted_at,NULL" . $logged_user->id,
+                "email" => "required|email|unique:users,email,NULL,NULL,deleted_at,NULL" . $logged_user->id,
             ]);
 
-            $input = $request->all();
-            $logged_user->update($input);
+            $logged_user->name = $request->fullName;
+            $logged_user->email = $request->email;
+            $logged_user->username = strtolower($request->username);
+            $logged_user->cityId = $loggedInUser->cityId;
+            $logged_user->branchId = $loggedInUser->branchId;
+            $logged_user->phone = $request->phone;
+            $logged_user->status = 1;
+            $logged_user->save();
         }
-        return redirect(route('dashboard'))->with('success', 'Staff updated successfully');
+        return redirect()->route('staffs.index')->with('success', 'Staff updated successfully');
     }
 
     public function uploadCropImage(Request $request)

@@ -9,35 +9,41 @@
                 <!-- conversation user -->
                 <div class="position-relative">
                     <div class="p-3 user-chat-topbar">
-                        {{-- <div class="row align-items-center">
-                             <div class="col-sm-4 col-8">
+                        <div class="row align-items-center">
+                            <div class="col-sm-4 col-8">
                                 <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0 d-block d-lg-none me-3">
+                                    {{-- <div class="flex-shrink-0 d-block d-lg-none me-3">
                                         <a href="javascript: void(0);" class="user-chat-remove fs-18 p-1"><i
                                                 class="ri-arrow-left-s-line align-bottom"></i></a>
-                                    </div>
+                                    </div> --}}
                                     <div class="flex-grow-1 overflow-hidden">
                                         <div class="d-flex align-items-center">
-                                            <div
+                                            {{-- <div
                                                 class="flex-shrink-0 chat-user-img online user-own-img align-self-center me-3 ms-0">
-                                                <img src="assets/images/users/avatar-2.jpg" class="rounded-circle avatar-xs"
-                                                    alt="">
-                                                <span class="user-status"></span>
-                                            </div>
+                                                <img src="{{ asset('assets/images/users/avatar-2.jpg') }}"
+                                                    class="rounded-circle avatar-xs" alt="">
+                                            <span class="user-status"></span>
+                                        </div> --}}
                                             <div class="flex-grow-1 overflow-hidden">
                                                 <h5 class="text-truncate mb-0 fs-16"><a class="text-reset username"
-                                                        data-bs-toggle="offcanvas" href="#userProfileCanvasExample"
-                                                        aria-controls="userProfileCanvasExample">Lisa Parker</a></h5>
-                                                <p class="text-truncate text-muted fs-14 mb-0 userStatus">
+                                                        data-bs-toggle="offcanvas" href=""
+                                                        aria-controls="userProfileCanvasExample">{{ strtoupper($quotation->clientName) }}</a>
+                                                </h5>
+                                                {{-- <p class="text-truncate text-muted fs-14 mb-0 userStatus">
                                                     <small>Online</small>
-                                                </p>
+                                                </p> --}}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-sm-8 col-4">
-                                <ul class="list-inline user-chat-nav text-end mb-0">
+                                <div class="list-inline user-chat-nav text-end mb-0 flex-shrink-0">
+                                    <a href="{{ route('quotations-responses') }}" class="btn btn-success btn-label btn-sm">
+                                        <i class="ri-arrow-left-fill label-icon align-middle fs-16 me-2"></i> Back
+                                    </a>
+                                </div>
+                                {{-- <ul class="list-inline user-chat-nav text-end mb-0">
                                     <li class="list-inline-item m-0">
                                         <div class="dropdown">
                                             <button class="btn btn-ghost-secondary btn-icon" type="button"
@@ -108,9 +114,9 @@
                                             </div>
                                         </div>
                                     </li>
-                                </ul>
+                                </ul> --}}
                             </div>
-                        </div> --}}
+                        </div>
 
                     </div>
                     <!-- end chat user head -->
@@ -131,18 +137,18 @@
                                                         @if ($chat->type == 'client')
                                                             <li class="chat-list left">
                                                                 <div class="conversation-list">
-                                                                    <div class="chat-avatar">
+                                                                    {{-- <div class="chat-avatar">
                                                                         <img src="assets/images/users/avatar-2.jpg"
                                                                             alt="">
-                                                                    </div>
+                                                                    </div> --}}
                                                                     <div class="user-chat-content">
                                                                         <div class="ctext-wrap">
                                                                             <div class="ctext-wrap-content">
-                                                                                <p class="mb-0 ctext-content">Good morning
-                                                                                    😊
+                                                                                <p class="mb-0 ctext-content">
+                                                                                    {{ $chat->message }}
                                                                                 </p>
                                                                             </div>
-                                                                            <div
+                                                                            {{-- <div
                                                                                 class="dropdown align-self-start message-box-drop">
                                                                                 <a class="dropdown-toggle" href="#"
                                                                                     role="button" data-bs-toggle="dropdown"
@@ -167,10 +173,10 @@
                                                                                         href="#"><i
                                                                                             class="ri-delete-bin-5-line me-2 text-muted align-bottom"></i>Delete</a>
                                                                                 </div>
-                                                                            </div>
+                                                                            </div> --}}
                                                                         </div>
                                                                         <div class="conversation-name"><small
-                                                                                class="text-muted time">09:07 am</small>
+                                                                                class="text-muted time">{{ $chat->created_at->format('H:m') }}</small>
                                                                             <span class="text-success check-message-icon"><i
                                                                                     class="ri-check-double-line align-bottom"></i></span>
                                                                         </div>
