@@ -246,4 +246,14 @@ class ItineraryController extends Controller
             print_r($e->errorInfo);
         }
     }
+    public function DeleteItineraryTemplateDetail($id)
+    {
+
+        $templateDetail = ItineraryTemplateDetail::findOrFail($id);
+        try {
+            return $templateDetail->delete();
+        } catch (QueryException $e) {
+            print_r($e->errorInfo);
+        }
+    }
 }

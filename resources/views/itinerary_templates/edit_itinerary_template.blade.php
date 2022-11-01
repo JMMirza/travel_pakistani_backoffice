@@ -219,7 +219,7 @@
                                             <a href="{{ url('/edit-itinerary-templates-detail/'.$d->id) }}" class="btn btn-sm btn-success btn-icon waves-effect waves-light">
                                                 <i class="mdi mdi-lead-pencil"></i>
                                             </a>
-                                            <a href="" data-table="itinerary-templates-data-table" class="btn btn-sm btn-danger btn-icon waves-effect waves-light delete-record">
+                                            <a href="{{ url('/delete-itinerary-templates-detail/'.$d->id) }}" data-table="itinerary-templates-data-table" class="btn btn-sm btn-danger btn-icon waves-effect waves-light delete-record">
                                                 <i class="ri-delete-bin-5-line"></i>
                                             </a>
                                         </td>
