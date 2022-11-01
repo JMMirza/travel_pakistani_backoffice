@@ -47,6 +47,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resources(['/hotels' => HotelController::class]);
     Route::resources(['/templates' => TermsAndConditionController::class]);
     Route::resources(['/itinerary-templates' => ItineraryController::class]);
+    //Rehman
+    Route::post('save-itinerary-detail', [ItineraryController::class, 'saveItineraryDetail'])->name('save-itinerary-detail');
+    Route::get('/edit-itinerary-templates-detail/{id}', [ItineraryController::class, 'EditItineraryTemplateDetail'])->name('edit-itinerary-templates-detail');
+    //Rehman
     Route::get('profile', [CommonController::class, 'profile'])->name('profile');
     Route::post('/update-profile/{id}', [UserController::class, 'update_user_profile'])->name('update-profile');
     Route::get('/open-bank-modal', [UserController::class, 'open_bank_modal'])->name('open-bank-modal');
