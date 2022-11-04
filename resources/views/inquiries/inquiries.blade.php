@@ -36,6 +36,8 @@
         </div>
     </div>
     <input id="ajaxRoute" value="{{ route('inquiries.index') }}" hidden />
+
+   @include('inquiries.create_quotation_template')
 @endsection
 
 
@@ -43,6 +45,49 @@
 @endpush
 
 @push('footer_scripts')
+    <script>
+
+        $(document).ready(function() {
+
+            $(document).on('click', '.show-modal-inquiry-quotation', function(e) {
+
+                e.preventDefault();
+
+                var target = $(this).data('target');
+                var url = $(this).data('url');
+                console.log(url);
+
+                $.ajax({
+
+                    url: url,
+                    type: "GET",
+                    // dataType: 'html',
+                    headers: {
+                        'X-CSRF-Token': '{{ csrf_token() }}',
+                    },
+                    cache: false,
+                    success: function(data) {
+
+                       // $('#modal-div').html(data);
+
+
+                        //$(target).modal('show');
+                        $('#InquiryQuotationTemplateModal').modal('show');
+                    },
+                    error: function() {
+
+                    },
+                    beforeSend: function() {
+
+                    },
+                    complete: function() {
+
+                    }
+                });
+            });
+
+        });
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script type="text/javascript" src="{{ asset('modules/inquiries.js') }}"></script>
 @endpush
