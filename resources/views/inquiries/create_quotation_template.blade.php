@@ -21,8 +21,7 @@
                             <th>Version</th>
                             <th>Inquire Date</th>
                             <th>Created At</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+
                         </tr>
                         </thead>
                         <tbody>

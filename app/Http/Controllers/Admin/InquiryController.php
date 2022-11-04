@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Inquiry;
+use App\Models\Quotation;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -329,5 +330,62 @@ class InquiryController extends Controller
                 $result = curl_exec($ch);
             }
         }
+    }
+    public function listQuotationTemplates(Request $request)
+    {
+        $inquireId = $request->inquire_id;
+
+
+        $quotations = Quotation::where('inquiryId','=',$inquireId)->where('isTemplate',1)->get();
+
+        return Datatables::of($quotations)
+            ->addIndexColumn()
+            ->addColumn('created_at', function ($row) {
+                return $row->created_at->format('Y-m-d');
+            })
+            ->addColumn('processedByName', function ($row) {
+
+                if ($row->processedByUser) {
+                    return $row->processedByUser->name;
+                }
+
+                return 'N/A';
+            })
+
+            ->addColumn('action', function ($row) {
+
+                return '
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            </button>
+                            <div class="dropdown-menu" style="">
+                                <a class="dropdown-item" href="' . route('quotation-edit', $row->id) . '?tab=1">Edit</a>
+                                <a class="dropdown-item" href="#">Invoice</a>
+                                <a class="dropdown-item" href="#">Chat</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="#">Delete</a>
+                            </div>
+                        </div>
+
+                    ';
+            })
+
+            ->rawColumns(['action', 'status'])
+            ->make(true);
+
+
+
+        return view('inquiries.create_quotation_template', [
+            'quotationTemplates' => $quotationTemplates,
+            'inquireId' => $inquireId,
+        ]);
+    }
+    public function createQuotationTemplateModal(Request $request)
+    {
+        $inquireId = $request->inquire_id;
+        return view('inquiries.create_quotation_template', [
+
+            'inquireId' => $inquireId,
+        ]);
     }
 }

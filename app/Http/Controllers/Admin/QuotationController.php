@@ -374,67 +374,7 @@ class QuotationController extends Controller
     {
         return ItineraryQuotation::where('id', $id)->delete();
     }
-    public function createQuotationTemplateModal(Request $request)
-    {
-        $inquireId = $request->inquire_id;
 
-
-        $quotations = Quotation::where('inquiryId','=',$inquireId)->where('isTemplate',1)->get();
-
-//        if ($request->status && $request->status > 0) {
-//            $quotations = Quotation::where('isTemplate',1)->get();
-//        }
-
-//        if ($request->has('search_text') && $request->search_text !== '') {
-//
-//            $search_text = $request->search_text;
-//            $quotations = $quotations->where(function ($query) use ($search_text) {
-//                $query->where('clientName', 'like', '%' . $search_text . '%')->orWhere('clientEmail', 'like', '%' . $search_text . '%');
-//            });
-//        }
-
-        return Datatables::of($quotations)
-            ->addIndexColumn()
-            ->addColumn('created_at', function ($row) {
-                return $row->created_at->format('Y-m-d');
-            })
-            ->addColumn('processedByName', function ($row) {
-
-                if ($row->processedByUser) {
-                    return $row->processedByUser->name;
-                }
-
-                return 'N/A';
-            })
-
-            ->addColumn('action', function ($row) {
-
-                return '
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            </button>
-                            <div class="dropdown-menu" style="">
-                                <a class="dropdown-item" href="' . route('quotation-edit', $row->id) . '?tab=1">Edit</a>
-                                <a class="dropdown-item" href="#">Invoice</a>
-                                <a class="dropdown-item" href="#">Chat</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="#">Delete</a>
-                            </div>
-                        </div>
-
-                    ';
-            })
-
-            ->rawColumns(['action', 'status'])
-            ->make(true);
-
-
-
-        return view('inquiries.create_quotation_template', [
-            'quotationTemplates' => $quotationTemplates,
-            'inquireId' => $inquireId,
-        ]);
-    }
     public function addQuotationHotelModal(Request $request)
     {
         $itineraryQuotation = null;
