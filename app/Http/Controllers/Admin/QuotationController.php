@@ -1214,6 +1214,24 @@ class QuotationController extends Controller
         dd($request->all());
     }
 
+    public function createQuotationFromTemplate(Request $request, $quotation_id)
+    {
+        $quotationPrevious = Quotation::findOrFail($quotation_id);
+
+        $data = $quotationPrevious->toArray();
+
+        if ($request->has('inquiry_id')) {
+            $data['inquiryId'] = $request->inquiry_id;
+        }
+
+        $data['isTemplate'] = 0;
+
+        $quotation = Quotation::create($data);
+
+        $quotationPrevious->copyQuotationData($quotation);
+        return redirect()->route('quotation-edit', $quotation->id);
+    }
+
     //Legcy Code below
 
     public function quotationTemplates(Quotation $quotation)

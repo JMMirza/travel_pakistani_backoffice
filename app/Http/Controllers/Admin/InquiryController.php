@@ -331,12 +331,23 @@ class InquiryController extends Controller
             }
         }
     }
+
+
+
+    public function createQuotationTemplateModal(Request $request)
+    {
+        $inquireId = $request->inquire_id;
+        return view('inquiries.create_quotation_template', [
+            'inquireId' => $inquireId,
+        ]);
+    }
+
     public function listQuotationTemplates(Request $request)
     {
         $inquireId = $request->inquire_id;
 
 
-        $quotations = Quotation::where('inquiryId','=',$inquireId)->where('isTemplate',1)->get();
+        $quotations = Quotation::where('inquiryId', '=', $inquireId)->where('isTemplate', 1)->get();
 
         return Datatables::of($quotations)
             ->addIndexColumn()
@@ -355,19 +366,10 @@ class InquiryController extends Controller
             ->addColumn('action', function ($row) {
 
                 return '
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            </button>
-                            <div class="dropdown-menu" style="">
-                                <a class="dropdown-item" href="' . route('quotation-edit', $row->id) . '?tab=1">Edit</a>
-                                <a class="dropdown-item" href="#">Invoice</a>
-                                <a class="dropdown-item" href="#">Chat</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="#">Delete</a>
-                            </div>
-                        </div>
-
-                    ';
+                    <a href="' . route('create-template-quotation', $row->id) . '" class="btn btn-success btn-label btn-sm" data-inquireId="' . $row->id . '" data-quotationId="' . $row->id . '" >
+                        <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Create Quotation
+                    </a>
+                ';
             })
 
             ->rawColumns(['action', 'status'])
@@ -377,14 +379,6 @@ class InquiryController extends Controller
 
         return view('inquiries.create_quotation_template', [
             'quotationTemplates' => $quotationTemplates,
-            'inquireId' => $inquireId,
-        ]);
-    }
-    public function createQuotationTemplateModal(Request $request)
-    {
-        $inquireId = $request->inquire_id;
-        return view('inquiries.create_quotation_template', [
-
             'inquireId' => $inquireId,
         ]);
     }
