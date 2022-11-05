@@ -125,20 +125,21 @@
                         </form>
                     </div>
                     <div class="tab-pane {{ isset($tab) && $tab == 2 ? 'active' : '' }}" id="nav-border-top-02" role="tabpanel">
-                        <form class="needs-validation row g-3 mb-3" action="{{ route('itinerary-templates.update', $itinerary_template->id) }}" method="POST" enctype="multipart/form-data" novalidate>
+                        <form class="needs-validation row g-3 mb-3" action="{{ route('save-itinerary-detail',$itinerary_template->id) }}" method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
-                            <input type="hidden" value="{{ $itinerary_template->id }}" name="itineraryTemplateId" />
+                            <input type="hidden" value="{{ isset($itinerary_template_details_obj->id) ? $itinerary_template_details_obj->id :''  }}" name="itineraryTemplateDetailId" />
+                            <input type="hidden" value="{{ isset($itinerary_template->id) ? $itinerary_template->id :''  }}" name="itineraryTemplateId" />
                             <div class="col-md-4 col-sm-12">
                                 <div class="form-label-group in-border">
                                     <label for="itineraryCities" class="form-label">City</label>
-                                    <select class="form-control landmark-filters" name="itineraryCities" id="itineraryCities" required>
+                                    <select class="form-control landmark-filters" name="cityId" id="itineraryCities" required>
                                         @foreach ($cities as $city)
-                                        <option value="{{ $city->city_id }}">{{ $city->title }}</option>
+                                        <option value="{{ $city->city_id }}"@if(isset($itinerary_template_details_obj->cityId) && $city->city_id==$itinerary_template_details_obj->cityId) selected @endif>{{ $city->title }}</option>
                                         @endforeach
                                     </select>
                                     <div class="invalid-feedback">
-                                        @if ($errors->has('itineraryCities'))
-                                        {{ $errors->first('itineraryCities') }}
+                                        @if ($errors->has('cityId'))
+                                        {{ $errors->first('cityId') }}
                                         @else
                                         Select the City!
                                         @endif
@@ -148,10 +149,10 @@
                             <div class="col-md-4 col-sm-12">
                                 <div class="form-label-group in-border">
                                     <label for="pickupTime" class="form-label">Day Number</label>
-                                    <input type="number" class="form-control @if ($errors->has('numberDays')) is-invalid @endif" id="templateTitle" name="numberDays" placeholder="Please Enter" value="{{ old('numberDays') }}" required>
+                                    <input type="number" class="form-control @if ($errors->has('dayNo')) is-invalid @endif" id="templateTitle" name="dayNo" placeholder="Please Enter" value="@if(isset($itinerary_template_details_obj->dayNo)){{$itinerary_template_details_obj->dayNo}}@endif" required>
                                     <div class="invalid-feedback">
-                                        @if ($errors->has('numberDays'))
-                                        {{ $errors->first('numberDays') }}
+                                        @if ($errors->has('dayNo'))
+                                        {{ $errors->first('dayNo') }}
                                         @else
                                         Day is required!
                                         @endif
@@ -161,7 +162,7 @@
                             <div class="col-md-4 col-sm-12">
                                 <div class="form-label-group in-border">
                                     <label for="pickupTime" class="form-label">Pickup Time</label>
-                                    <input type="time" class="form-control @if ($errors->has('pickupTime')) is-invalid @endif" id="templateTitle" name="pickupTime" placeholder="Please Enter" value="{{ old('pickupTime') }}">
+                                    <input type="time" class="form-control @if ($errors->has('pickupTime')) is-invalid @endif" id="templateTitle" name="pickupTime" placeholder="Please Enter" value="@if(isset($itinerary_template_details_obj->pickupTime)){{$itinerary_template_details_obj->pickupTime}}@else{{ old('pickupTime') }}@endif">
                                     <div class="invalid-feedback">
                                         @if ($errors->has('pickupTime'))
                                         {{ $errors->first('pickupTime') }}
@@ -174,13 +175,13 @@
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-label-group in-border">
                                     <label for="description" class="form-label">Description</label>
-                                    <textarea class="form-control" name="discription" id="description" placeholder="Enter description here..."></textarea>
+                                    <textarea class="form-control" name="description" id="description" placeholder="Enter description here...">@if(isset($itinerary_template_details_obj->description)){{$itinerary_template_details_obj->description}}@endif</textarea>
                                 </div>
                             </div>
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-label-group in-border">
-                                    <label for="description" class="form-label">Photo</label>
-                                    <input type="file" class="form-control" name="photo" id="description"></input>
+                                    <label for="photo" class="form-label">Photo</label>
+                                    <input type="file" class="form-control" name="photo" id="photo">
                                 </div>
                             </div>
                             <div class="col-12">
@@ -204,15 +205,22 @@
 
                                     @forelse ($itinerary_template->templateDetails as $d)
                                     <tr>
-                                        <td>{{ $d->dayNo }}</td>
-                                        <td>{{ $d->city->title }}</td>
-                                        <td>{{ $d->pickupTime }}</td>
-                                        <td>{{ $d->description }}</td>
+                                        <td>{{ $d->dayNo ?? "N/A" }}</td>
+                                        <td>{{ $d->city->title ?? "N/A" }}</td>
+                                        <td>{{ $d->pickupTime ?? "N/A" }}</td>
+                                        <td>{{ $d->description ?? "N/A" }}</td>
                                         <td>
-                                            <a href="" class="btn btn-sm btn-success btn-icon waves-effect waves-light">
+{{--                                            <form method="PUT" action="/tasks/update">--}}
+{{--                                                @csrf--}}
+{{--                                                <input type="hidden" name="TempDetailId" value="{{ $d->id }}">--}}
+{{--                                               --}}
+{{--                                                <button type="submit" class="btn btn-primary" name="updateTask">Update Task</button>--}}
+{{--                                            </form>--}}
+
+                                            <a href="{{ url('/edit-itinerary-templates-detail/'.$d->id) }}" class="btn btn-sm btn-success btn-icon waves-effect waves-light">
                                                 <i class="mdi mdi-lead-pencil"></i>
                                             </a>
-                                            <a href="" data-table="itinerary-templates-data-table" class="btn btn-sm btn-danger btn-icon waves-effect waves-light delete-record">
+                                            <a href="{{ url('/delete-itinerary-templates-detail/'.$d->id) }}" data-table="itinerary-templates-data-table" class="btn btn-sm btn-danger btn-icon waves-effect waves-light delete-record">
                                                 <i class="ri-delete-bin-5-line"></i>
                                             </a>
                                         </td>

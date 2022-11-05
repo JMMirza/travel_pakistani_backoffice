@@ -46,6 +46,11 @@
 
         var url = $(this).attr('href');
         var table = $(this).data('table');
+        var actionType = 'ajax';
+        console.log($(this).data('action-type'));
+        if($(this).data('action-type') === undefined){
+             actionType = $(this).data('action-type');
+        }
 
         Swal.fire({
             html: '<div class="mt-3">' +
@@ -64,29 +69,34 @@
         }).then(function(result) {
 
             if (result.isConfirmed) {
+                if (actionType == 'ajax') {
+                    console.log('if');
+                    $.ajax({
 
-                $.ajax({
+                        url: url,
+                        type: "DELETE",
+                        // data : filters,
+                        headers: {
+                            'X-CSRF-Token': '{{ csrf_token() }}',
+                        },
+                        cache: false,
+                        success: function (data) {
+                            $('#' + table).DataTable().ajax.reload(null, false);
+                        },
+                        error: function () {
 
-                    url: url,
-                    type: "DELETE",
-                    // data : filters,
-                    headers: {
-                        'X-CSRF-Token': '{{ csrf_token() }}',
-                    },
-                    cache: false,
-                    success: function(data) {
-                        $('#' + table).DataTable().ajax.reload(null, false);
-                    },
-                    error: function() {
+                        },
+                        beforeSend: function () {
 
-                    },
-                    beforeSend: function() {
+                        },
+                        complete: function () {
 
-                    },
-                    complete: function() {
-
-                    }
-                });
+                        }
+                    });
+                } else {
+                    console.log('else');
+                    window.location = url;
+                }
             }
         });
     });

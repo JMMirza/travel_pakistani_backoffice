@@ -3,6 +3,7 @@
         @csrf
         <input type="hidden" id="quoteStatus" name="quoteStatus" value="8">
         <input type="hidden" id="quotationId" name="quotationId" value="{{ isset($quotation) ? $quotation->id : 0 }}">
+        <input type="hidden" id="inquiryId" name="inquiryId" value="{{ isset($inquire_id) ? $inquire_id : 0 }}">
 
         @if(isset($quotation) && $quotation->id > 0)
         <div class="col-md-12">
@@ -80,8 +81,8 @@
             <label for="processedBy" class="form-label">Managed By <span class="text-danger">*</span></label>
             <select class="form-control" id="processedBy" placeholder="Select cities" name="processedBy" required>
                 <option value="">Please select</option>
-                @foreach ($users as $user)
-                <option value="{{ $user->id }}" {{ isset($quotation) && $quotation->userId == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                @foreach ($staff as $s)
+                <option value="{{ $s->user->id }}" {{ isset($quotation) && $quotation->userId == $s->user->id ? 'selected' : '' }}>{{ $s->user->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -111,7 +112,7 @@
     $(document).ready(function() {
 
         $('#tourDates').flatpickr({
-            // minDate: "today",
+            minDate: "today",
             mode: "range",
             altInput: true,
             altFormat: "F j, Y",

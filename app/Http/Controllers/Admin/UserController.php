@@ -20,7 +20,8 @@ use App\Models\Staff;
 use App\Models\UserType;
 use App\Notifications\SendPasswordToNewStaff;
 use Cloudder;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\QueryException;
@@ -39,7 +40,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $user = \Auth::user();
+        $user = Auth::user();
 
         // $user = User::with('userable.staff.user')->where('id', $user->id)->first();
         // dd($user->userable->staff->toArray());
@@ -100,8 +101,8 @@ class UserController extends Controller
 
     public function editUserRolesPermissions(Request $request, $id)
     {
-        // dd(\Auth::user()->roles());
-        if (\Auth::user()->hasRole('admin')) {
+        // dd(Auth::user()->roles());
+        if (Auth::user()->hasRole('admin')) {
             $user = User::query()
                 ->with(['roles:id,name', 'permissions:id,name'])
                 ->findOrFail($id);
@@ -157,7 +158,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        $user = \Auth::user();
+        $user = Auth::user();
         $user = User::with('userable.staff.user')->where('id', $user->id)->first();
         return view('staffs.add_new_profile', ["user" => $user]);
     }
@@ -178,7 +179,7 @@ class UserController extends Controller
             "email" => "required|email|unique:users,email,NULL,NULL,deleted_at,NULL",
         ]);
 
-        $loggedInUser = \Auth::user();
+        $loggedInUser = Auth::user();
 
         $staff = new Staff();
 
@@ -247,7 +248,7 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $user = \Auth::user();
+        $user = Auth::user();
         $user_info = Staff::with(['user', 'reportsToUser'])->where('id', $id)->first();
         $users = User::with('userable.staff.user')->where('id', $user->id)->first();
         // dd($user_info->toArray());
@@ -269,7 +270,7 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $logged_user = User::findorfail($request->user_id);
-        $loggedInUser = \Auth::user();
+        $loggedInUser = Auth::user();
         // dd($logged_user->toArray());
         if ($request->password) {
             $request->validate([
