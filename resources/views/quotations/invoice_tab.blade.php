@@ -9,18 +9,68 @@
             <table class="table align-middle table-nowrap  mb-3">
                 <thead class="table-light">
                     <tr>
-                        <td scope="col"><strong>Total Amount:</strong> </td>
-                        <td scope="col"><strong>Total Paid:</strong> </td>
-                        <td scope="col"><strong>Total Remaining:</strong> </td>
+                        <td scope="col"><strong>Total Amount:</strong> {{ number_format($discountedAmount) }}</td>
+                        <td scope="col"><strong>Total Paid:</strong> {{ number_format($totalPaid) }} </td>
+                        <td scope="col"><strong>Total Remaining:</strong> {{ number_format($totalRemaining) }} </td>
                     </tr>
                 </thead>
             </table>
         </div>
 
+        <div class="table-responsive ">
+            <table class="table align-middle table-nowrap  mb-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sr#</th>
+                        <th>Due Date</th>
+                        <th>Paid Date</th>
+                        <th>Total Amount</th>
+                        <th>Due Amount</th>
+                        <th>Remaining Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($quotation->quotationInvoices as $k => $invoice)
+                    <tr>
+                        <td>{{ $k+1 }}</td>
+                        <td>Due Date</td>
+                        <td>Paid Date</td>
+                        <td>{{ number_format($invoice->totalAmount) }}</td>
+                        <td>{{ number_format($invoice->dueAmount) }}</td>
+                        <td>{{ number_format($invoice->remainingAmount) }}</td>
+                        <td style="width: 50px;">
+                            @if($invoice->staus == 0)
+                            <a href="{{ route('add-quotation-itinerary-modal') }}" class="btn btn-success btn-label btn-sm">
+                                <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Mark Paid
+                            </a>
+                            @else
+                            <a href="{{ route('add-quotation-itinerary-modal') }}" class="btn btn-success btn-label btn-sm">
+                                <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Paid
+                            </a>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8">
+                            <div class="alert alert-light alert-dismissible alert-solid alert-label-icon fade show" role="alert">
+                                <i class="ri-question-line label-icon"></i><strong>Info</strong> -
+                                No itinerary added to quotation.
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
         <div class="row g-3">
             <div class="col-md-12">
-                <label for="staffRemarks" class="form-label">Description </label>
-                <textarea class="form-control" id="description" placeholder="Enter description" name="description"></textarea>
+                <label for="staffRemarks" class="form-label">Description <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="description" placeholder="Enter description" name="description" required></textarea>
             </div>
             <div class="col-md-3">
                 <label for="dueAmount" class="form-label">Amount <span class="text-danger">*</span></label>
@@ -28,7 +78,7 @@
             </div>
             <div class="col-md-3">
                 <label for="remainingAmount" class="form-label">Remaining Amount </label>
-                <input type="number" value="" class="form-control" id="remainingAmount" placeholder="Enter remaining amount" name="remainingAmount" readonly required>
+                <input type="number" value="{{ $totalRemaining }}" class="form-control" id="remainingAmount" placeholder="Enter remaining amount" name="remainingAmount" readonly required>
             </div>
             <div class="col-md-3">
                 <label for="invoiceDate" class="form-label">Invoice Date <span class="text-danger">*</span></label>
