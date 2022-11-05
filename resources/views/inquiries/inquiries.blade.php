@@ -124,7 +124,7 @@
                     $.fn.dataTable.tables({
                         visible: true,
                         api: true
-                    }).columns.adjust().draw();;
+                    }).columns.adjust().draw();
                 },
                 error: function() {
 

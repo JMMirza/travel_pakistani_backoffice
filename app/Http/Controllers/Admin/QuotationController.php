@@ -1229,7 +1229,7 @@ class QuotationController extends Controller
         $quotation = Quotation::create($data);
 
         $quotationPrevious->copyQuotationData($quotation);
-        return redirect()->route('quotation-edit', $quotation->id);
+        return redirect()->route('quotation-edit', $quotation->id)->with("success", "Your quotation has been created from the previously selected template");;
     }
 
     //Legcy Code below
