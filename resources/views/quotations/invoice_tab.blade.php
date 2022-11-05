@@ -12,6 +12,14 @@
                         <td scope="col"><strong>Total Amount:</strong> {{ number_format($discountedAmount) }}</td>
                         <td scope="col"><strong>Total Paid:</strong> {{ number_format($totalPaid) }} </td>
                         <td scope="col"><strong>Total Remaining:</strong> {{ number_format($totalRemaining) }} </td>
+                        <td scope="col" style="width: 100px;">
+                            <a href="" class="btn btn-info btn-label btn-sm">
+                                <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Download
+                            </a>
+                            <a href="" class="btn btn-danger btn-label btn-sm">
+                                <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Print
+                            </a>
+                        </td>
                     </tr>
                 </thead>
             </table>
