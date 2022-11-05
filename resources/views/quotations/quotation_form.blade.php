@@ -34,6 +34,9 @@
 
                 @if(isset($quotation))
                 <div class="flex-shrink-0">
+                    <a href="{{ route('quotation-save', ['tab' => 1]) }}" class="btn btn-success btn-label btn-sm">
+                        <i class="ri-file-list-3-line label-icon align-middle fs-16 me-2"></i> New Quotation
+                    </a>
                     <a href="https://travelpakistani.com/quotation/{{ $quotation->liveQuotation }}" class="btn btn-success btn-label btn-sm">
                         <i class="ri-file-list-3-line label-icon align-middle fs-16 me-2"></i> View Quotation
                     </a>
@@ -87,6 +90,9 @@
                     @endif
                 </ul>
                 <div class="tab-content text-muted">
+
+
+
 
                     @include('quotations.basic_details_tab')
 

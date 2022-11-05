@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\QuotationInvoice;
+use App\Models\QuotationOrder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
@@ -10,6 +12,9 @@ use App\Models\ServiceQuotation;
 use App\Models\QuotationNote;
 use App\Models\QuotationStatusLog;
 use App\Models\QuotationImage;
+
+
+
 use Auth;
 
 class Quotation extends Model
@@ -81,6 +86,14 @@ class Quotation extends Model
         return $this->belongsTo(City::class, 'cityId', 'city_id');
     }
 
+    public function quotationInvoices()
+    {
+        return $this->hasMany(QuotationInvoice::class, 'quotationId');
+    }
+    public function quotationOrders()
+    {
+        return $this->hasMany(QuotationOrder::class, 'quotationId');
+    }
     public function hotelQuotations()
     {
         return $this->hasMany(HotelQuotation::class, 'quotationId');
@@ -257,5 +270,56 @@ class Quotation extends Model
 
             // exit;
         }
+    }
+
+
+    public function getQuotationAmounts()
+    {
+        $quotation = Quotation::findOrFail($this->id);
+
+        $totalCost = 0;
+        $finalAmount = 0;
+        $discountedAmount = 0;
+
+        $totalPaid = 0;
+        $totalRemaining = 0;
+
+        if ($quotation->markupType == 'Total') {
+            $hotelCostSum = $quotation->hotelQuotations->sum('hotelCost');
+            $serviceCostSum = $quotation->serviceQuotations->sum('serviceCost');
+            $discountedAmount = $totalCost = $finalAmount = $hotelCostSum + $serviceCostSum;
+
+            if ($quotation->markupTypeQuotation == 'Percentage') {
+                $extraMarkupValue = (($quotation->extraMarkup / 100) * $finalAmount);
+                $discountedAmount = $finalAmount = $finalAmount - $extraMarkupValue;
+            } else {
+                $discountedAmount = $finalAmount = $finalAmount - $quotation->extraMarkup;
+            }
+        }
+
+        if ($quotation->markupType == 'Individual') {
+            $hotelCostSum = $quotation->hotelQuotations->sum('hotelSales');
+            $serviceCostSum = $quotation->serviceQuotations->sum('serviceSales');
+            $discountedAmount = $totalCost = $finalAmount = $hotelCostSum + $serviceCostSum;
+        }
+
+        if ($quotation->discountType == 'Percentage') {
+            $discountValue = (($quotation->discountValue / 100) * $finalAmount);
+            $discountedAmount = $finalAmount - $discountValue;
+        } else {
+            $discountedAmount = $finalAmount - $quotation->discountValue;
+        }
+
+        // Invoice
+
+        $totalPaid = $quotation->quotationInvoices->where('status', 1)->sum('dueAmount');
+
+        return [
+            'totalCost' => $totalCost,
+            'finalAmount' => $finalAmount,
+            'discountedAmount' => $discountedAmount,
+            'totalPaid' => $totalPaid,
+            'totalRemaining' => $discountedAmount - $totalPaid,
+        ];
     }
 }

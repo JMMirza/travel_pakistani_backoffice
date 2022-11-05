@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Inquiry;
+use App\Models\Quotation;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -226,6 +227,7 @@ class InquiryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function show($id)
     {
         //
@@ -328,5 +330,56 @@ class InquiryController extends Controller
                 $result = curl_exec($ch);
             }
         }
+    }
+
+
+
+    public function createQuotationTemplateModal(Request $request)
+    {
+        $inquireId = $request->inquire_id;
+        return view('inquiries.create_quotation_template', [
+            'inquireId' => $inquireId,
+        ]);
+    }
+
+    public function listQuotationTemplates(Request $request)
+    {
+        $inquireId = $request->inquire_id;
+
+
+        $quotations = Quotation::where('inquiryId', '=', $inquireId)->where('isTemplate', 1)->get();
+
+        return Datatables::of($quotations)
+            ->addIndexColumn()
+            ->addColumn('created_at', function ($row) {
+                return $row->created_at->format('Y-m-d');
+            })
+            ->addColumn('processedByName', function ($row) {
+
+                if ($row->processedByUser) {
+                    return $row->processedByUser->name;
+                }
+
+                return 'N/A';
+            })
+
+            ->addColumn('action', function ($row) {
+
+                return '
+                    <a href="' . route('create-template-quotation', $row->id) . '" class="btn btn-success btn-label btn-sm" data-inquireId="' . $row->id . '" data-quotationId="' . $row->id . '" >
+                        <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Create Quotation
+                    </a>
+                ';
+            })
+
+            ->rawColumns(['action', 'status'])
+            ->make(true);
+
+
+
+        return view('inquiries.create_quotation_template', [
+            'quotationTemplates' => $quotationTemplates,
+            'inquireId' => $inquireId,
+        ]);
     }
 }

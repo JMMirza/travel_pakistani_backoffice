@@ -47,7 +47,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resources(['/hotels' => HotelController::class]);
     Route::resources(['/templates' => TermsAndConditionController::class]);
     Route::resources(['/itinerary-templates' => ItineraryController::class]);
+
+
     //Rehman
+    Route::get('/create-quotation-invoice-pdf/{id}', [QuotationController::class, 'createQuotationPDFInvoice'])->name('create-quotation-invoice-pdf');
+    Route::get('/create-quotation-template-modal', [InquiryController::class, 'createQuotationTemplateModal'])->name('create-quotation-template-modal');
+    Route::get('/list-quotation-templates', [InquiryController::class, 'listQuotationTemplates'])->name('list-quotation-templates');
+    Route::get('/create-template-quotation/{id}', [QuotationController::class, 'createQuotationFromTemplate'])->name('create-template-quotation');
+
     Route::post('save-itinerary-detail', [ItineraryController::class, 'saveItineraryDetail'])->name('save-itinerary-detail');
     Route::get('/edit-itinerary-templates-detail/{id}', [ItineraryController::class, 'EditItineraryTemplateDetail'])->name('edit-itinerary-templates-detail');
     Route::get('/delete-itinerary-templates-detail/{id}', [ItineraryController::class, 'DeleteItineraryTemplateDetail'])->name('delete-itinerary-templates-detail');
