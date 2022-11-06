@@ -38,7 +38,7 @@ class HomeController extends Controller
 
         // dd($user_ids);
 
-        echo $sql = "
+        $sql = "
         
             SELECT
                 u.id,
@@ -62,7 +62,7 @@ class HomeController extends Controller
 
         $data = \DB::select($sql);
 
-        dd($data);
+        // dd($data);
 
         return view('home');
     }
