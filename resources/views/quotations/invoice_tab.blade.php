@@ -13,10 +13,10 @@
                         <td scope="col"><strong>Total Paid:</strong> {{ number_format($totalPaid) }} </td>
                         <td scope="col"><strong>Total Remaining:</strong> {{ number_format($totalRemaining) }} </td>
                         <td scope="col" style="width: 100px;">
-                            <a href="{{ route('create-quotation-invoice-pdf',$quotation->id) }}" class="btn btn-info btn-label btn-sm">
+                            <a href="{{ route('create-quotation-invoice-pdf',$quotation->id.'?download=1') }}" class="btn btn-info btn-label btn-sm">
                                 <i class="ri-file-download-line label-icon align-middle fs-16 me-2"></i> Download
                             </a>
-                            <a href="{{ route('create-quotation-invoice-pdf',$quotation->id) }}" class="btn btn-danger btn-label btn-sm">
+                            <a href="{{ route('create-quotation-invoice-pdf',$quotation->id.'?print=1') }}" class="btn btn-danger btn-label btn-sm">
                                 <i class="ri-printer-line label-icon align-middle fs-16 me-2"></i> Print
                             </a>
                         </td>
