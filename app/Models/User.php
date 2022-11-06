@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Cloudder;
 use Laratrust\Traits\LaratrustUserTrait;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -41,6 +42,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
+    protected $appends = [
+        'profile_image_url',
+    ];
+
     /**
      * The attributes that should be cast.
      *
@@ -49,6 +54,18 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getProfileImageUrlAttribute()
+    {
+        $image = asset('theme/dist/default/assets/images/users/avatar-1.jpg');
+
+        if (!empty($this->profilePic)) {
+            $image = Cloudder::show($this->profilePic);
+            // $image = asset('/images/' . $this->avatar);
+        }
+
+        return $image;
+    }
 
     public function userable()
     {
