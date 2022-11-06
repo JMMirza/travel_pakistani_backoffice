@@ -203,7 +203,7 @@ class UserController extends Controller
         $randString = Str::random(10);
         $user->passwordText = $randString;
         $user->password = Hash::make($randString);
-        $user->credits = env("OPERATOR_CREDITS_FREE");
+        $user->credits = env("OPERATOR_CREDITS_FREE", '100');
 
         if ($request->hasFile("photo")) {
             // dd($request->all());
