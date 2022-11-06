@@ -6,19 +6,19 @@
 @endpush
 
 @section('content')
-    <div class="position-relative mx-n4 mt-n4">
+    {{-- <div class="position-relative mx-n4 mt-n4">
         <div class="profile-wid-bg profile-setting-img">
             <img src="{{ asset('theme/dist/default/assets/images/profile-bg.jpg') }}" class="profile-wid-img" alt="">
 
         </div>
-    </div>
-    <div class="row">
-        <div class="col-xxl-3">
+    </div> --}}
+    <div class="row position-relative mt-5">
+        <div class="col-lg-3">
             <div class="card mt-n5">
                 <div class="card-body p-4">
                     <div class="text-center">
                         <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
-                            <img src="{{ asset('theme/dist/default/assets/images/users/avatar-1.jpg') }}"
+                            <img src="{{ $operator->user->profile_image_url }}"
                                 class="rounded-circle avatar-xl img-thumbnail user-profile-image" alt="user-profile-image">
                             <div class="avatar-xs p-0 rounded-circle profile-photo-edit">
                                 <input id="profile-img-file-input" type="file" class="profile-img-file-input">
@@ -29,8 +29,8 @@
                                 </label>
                             </div>
                         </div>
-                        <h5 class="fs-16 mb-1">{{ Auth::user()->name }}</h5>
-                        <p class="text-muted mb-0">{{ Auth::user()->userable_type }}</p>
+                        <h5 class="fs-16 mb-1">{{ $operator->user->name }}</h5>
+                        <p class="text-muted mb-0">{{ $operator->user->userable_type }}</p>
                     </div>
                 </div>
             </div>
@@ -67,17 +67,22 @@
                             </span>
                         </div>
                         <input type="text" class="form-control" id="dribbleName" placeholder="Username"
-                            value="{{ Auth::user()->city->title }}" readonly>
+                            value="{{ $operator->user->city->title }}" readonly>
                     </div>
                 </div>
             </div>
             <!--end card-->
         </div>
 
-        <div class="col-xxl-9">
-            <div class="card mt-xxl-n5">
-                <div class="card-header">
+        <div class="col-lg-9">
+            <div class="card mt-lg-n5">
+                <div class="card-header align-items-center d-flex">
                     <h4 class="card-title mb-0 flex-grow-1">Edit Operator</h4>
+                    <div class="flex-shrink-0">
+                        <a href="{{ route('operators.index') }}" class="btn btn-success btn-label btn-sm">
+                            <i class="ri-arrow-left-fill label-icon align-middle fs-16 me-2"></i> Back
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body p-4">
                     <form action="javascript:void(0);">
@@ -106,13 +111,13 @@
                                     <select
                                         class="form-select form-control mb-3 @if ($errors->has('cityId')) is-invalid @endif"
                                         name="cityId">
-                                        <option value="" @if (Auth::user()->cityId == '') {{ 'selected' }} @endif
+                                        <option value="" @if ($operator->user->cityId == '') {{ 'selected' }} @endif
                                             selected disabled>
                                             Select One
                                         </option>
                                         @foreach ($cities as $city)
                                             <option value="{{ $city->city_id }}"
-                                                @if (Auth::user()->cityId == $city->city_id) {{ 'selected' }} @endif>
+                                                @if ($operator->user->cityId == $city->city_id) {{ 'selected' }} @endif>
                                                 {{ $city->title }}
                                             </option>
                                         @endforeach
@@ -127,22 +132,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-4">
-                                <div class="form-label-group in-border mb-3">
-                                    <label for="companyAddress" class="form-label">Address</label>
-                                    <input type="text"
-                                        class="form-control @if ($errors->has('companyAddress')) is-invalid @endif"
-                                        id="companyAddress" name="companyAddress" placeholder="Please Enter"
-                                        value="{{ $operator->companyAddress }}">
-                                    <div class="invalid-tooltip">
-                                        @if ($errors->has('companyAddress'))
-                                            {{ $errors->first('companyAddress') }}
-                                        @else
-                                            Address is required!
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
+
 
                             <div class="col-lg-4">
                                 <div class="form-label-group in-border mb-3">
@@ -161,7 +151,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-4">
+                            <div class="col-lg-6">
                                 <div class="form-label-group in-border mb-3">
                                     <label for="businessEmail" class="form-label">Email</label>
                                     <input type="text"
@@ -178,7 +168,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-4">
+                            <div class="col-lg-6">
                                 <div class="form-label-group in-border mb-3">
                                     <label for="contactPerson" class="form-label">Contact Person</label>
                                     <input type="text"
@@ -244,7 +234,20 @@
                                     </div>
                                 </div>
                             </div>
-
+                            <div class="col-lg-12">
+                                <div class="form-label-group in-border mb-3">
+                                    <label for="companyAddress" class="form-label">Address</label>
+                                    <textarea type="text" class="form-control @if ($errors->has('companyAddress')) is-invalid @endif"
+                                        id="companyAddress" name="companyAddress" placeholder="Please Enter">{{ $operator->companyAddress }}</textarea>
+                                    <div class="invalid-tooltip">
+                                        @if ($errors->has('companyAddress'))
+                                            {{ $errors->first('companyAddress') }}
+                                        @else
+                                            Address is required!
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-md-12 col-sm-12 mb-3">
                                 <label for="about" class="form-label">About</label>
                                 <div id="snow-editor" style="height: 300px;">{!! $operator->about !!}</div>

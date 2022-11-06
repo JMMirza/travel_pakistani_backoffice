@@ -8,16 +8,16 @@
                 <h4 class="card-title mb-0 flex-grow-1">Operators</h4>
                 {{-- @permission('add-course') --}}
                 <div class="flex-shrink-0">
-                    {{-- <a href="{{ route('operators.create') }}" class="btn btn-success btn-label btn-sm">
+                    <a href="{{ route('operators.create') }}" class="btn btn-success btn-label btn-sm">
                         <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Add New
-                    </a> --}}
+                    </a>
                 </div>
                 {{-- @endpermission --}}
             </div>
             <div class="card">
                 <div class="card-body">
-                    <table id="operators-data-table" class="table table-bordered table-striped align-middle table-nowrap mb-0"
-                        style="width:100%">
+                    <table id="operators-data-table"
+                        class="table table-bordered table-striped align-middle table-nowrap mb-0" style="width:100%">
                         <thead>
                             <tr>
                                 <th></th>

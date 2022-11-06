@@ -58,11 +58,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getProfileImageUrlAttribute()
     {
         $image = asset('theme/dist/default/assets/images/users/avatar-1.jpg');
+
         if (!empty($this->profilePic)) {
             $image = Cloudder::show($this->profilePic);
             // $image = asset('/images/' . $this->avatar);
         }
-        // dd($image);
 
         return $image;
     }

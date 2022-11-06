@@ -46,7 +46,8 @@ class OperatorController extends Controller
      */
     public function create()
     {
-        //
+        $cities = City::all();
+        return view('operators.create_new_operator', ['cities' => $cities]);
     }
 
     /**
@@ -110,6 +111,7 @@ class OperatorController extends Controller
     public function show($id)
     {
         $operator = Operator::with(["user", "user.city"])->find($id);
+        // dd($operator->toArray());
         $cities = City::all();
         return view('operators.edit_operator', ['operator' => $operator, 'cities' => $cities]);
     }
