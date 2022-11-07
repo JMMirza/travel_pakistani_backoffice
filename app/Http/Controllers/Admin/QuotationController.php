@@ -1205,27 +1205,65 @@ class QuotationController extends Controller
 
     public function createQuotationPDFInvoice(Request $request, $quotation_id)
     {
+        $user = Auth::user();
+        $cities = City::all();
+        $status = QuotationStatus::all();
 
         $quotation = Quotation::where(['id' => $quotation_id])->with([
             "user",
+            "hotelQuotations",
+            "activityQuotations",
+            "mealQuotations",
+            "transportQuotations",
+            "otherServicesQuotations",
+            "optionalServicesQuotations",
+            "quotationNotes",
             "quotationInvoices",
             "itineraryBasic",
-
+            "quotationImages",
+            "cancellationPolicy",
+            "bookingNotes",
+            "paymentTerms",
+            "freeText",
         ])->first();
+
+        $quotationAmounts = $quotation->getQuotationAmounts();
+
+         //dd($quotationAmounts);
+
+        $quotationParent = !empty($quotation->quotationParent) ? $quotation->quotationParent : $quotation->id;
+        $versions = Quotation::select('id', 'versionNo')->where(['quotationParent' => $quotationParent])->get();
+
+        $totalPersons = $quotation->adults;
+
+        if (isset($quotation->children) > 0) {
+
+            $totalPersons += ($quotation->children / 2);
+        }
 
         //$quotation = Quotation::findOrFail($quotation_id);
         $quotationInvoice = QuotationInvoice::where('quotationId',$quotation_id)->first();
 
-        $quotationAmounts = $quotation->getQuotationAmounts();
+
 
 
         $input['quotation'] = $quotation;
-        //dd($quotation->clientName);
-        $input['pdf'] = '';
+        $input['cities'] = $cities;
+        $input['status'] = $status;
+        $input['services'] = json_decode($quotation->requiredServices);
+        $input['userNotes'] = json_decode($quotation->userNotes);
+        $input['userNotes'] =  $quotationAmounts['finalAmount'];
+        $input['discountedAmount'] =    $quotationAmounts['discountedAmount'];
+        $input['totalPersons'] =    $totalPersons;
+        $input['totalPaid'] =   $quotationAmounts['totalPaid'];
+        $input['totalRemaining'] =  $quotationAmounts['totalRemaining'];
+
+
+        //dd($quotation->quotationInvoices);
         $input['totalAmount'] = $quotationAmounts['totalRemaining'];
         $input['quotationInvoice']  = $quotationInvoice;
         $input['invoiceNumber']  = 'TP' . ((int)$quotation_id);
-        $pdf = PDF::loadView('quotations.invoice_template_PDF', $input);
+        $pdf = PDF::loadView('quotations.invoice_pdf_html', $input);
         $pdfInvoiceSave=\Storage::disk('public')->put('quotations/invoices/pdf/quotation_invoice_'.$quotation_id.'.pdf', $pdf->output(), 'public');
         //Download Invoice
         if(isset($request->download)){
@@ -1260,6 +1298,7 @@ class QuotationController extends Controller
         $input['remainingAmount'] = $quotationAmounts['totalRemaining'] - $request->dueAmount;
 
         QuotationInvoice::create($input);
+        return redirect()->back()->with("success", "Your invoice has been created");
     }
 
     public function createQuotationFromTemplate(Request $request, $quotation_id)
@@ -1277,7 +1316,7 @@ class QuotationController extends Controller
         $quotation = Quotation::create($data);
 
         $quotationPrevious->copyQuotationData($quotation);
-        return redirect()->route('quotation-edit', $quotation->id)->with("success", "Your quotation has been created from the previously selected template");;
+        return redirect()->route('quotation-edit', $quotation->id)->with("success", "Your quotation has been created from the previously selected template");
     }
 
     //Legcy Code below
