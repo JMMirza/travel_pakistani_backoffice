@@ -85,7 +85,7 @@
                     </div>
                 </div>
                 <div class="card-body p-4">
-                    <form class="row  needs-validation" action="{{ route('landmarks.update', $operator->id) }}"
+                    <form class="row  needs-validation" action="{{ route('operators.update', $operator->id) }}"
                         method="POST" enctype="multipart/form-data" novalidate>
                         @csrf
                         @method('PUT')
