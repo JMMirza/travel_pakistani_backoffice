@@ -1205,6 +1205,7 @@ class QuotationController extends Controller
 
     public function createQuotationPDFInvoice(Request $request, $quotation_id)
     {
+
         $quotation = Quotation::where(['id' => $quotation_id])->with([
             "user",
             "quotationInvoices",
@@ -1225,8 +1226,15 @@ class QuotationController extends Controller
         $input['quotationInvoice']  = $quotationInvoice;
         $input['invoiceNumber']  = 'TP' . ((int)$quotation_id);
         $pdf = PDF::loadView('quotations.invoice_template_PDF', $input);
-        \Storage::disk('public')->put('quotations/invoices/pdf/quotation_invoice_'.$quotation_id.'.pdf', $pdf->output(), 'public');
-        return $pdf->download($quotation_id.'-'.$input['invoiceNumber'].'-invoice.pdf');
+        $pdfInvoiceSave=\Storage::disk('public')->put('quotations/invoices/pdf/quotation_invoice_'.$quotation_id.'.pdf', $pdf->output(), 'public');
+        //Download Invoice
+        if(isset($request->download)){
+            return $pdf->download($quotation_id.'-'.$input['invoiceNumber'].'-invoice.pdf');
+        }
+        //Open invoice
+        if(isset($request->print)){
+            return $pdf->stream($quotation_id.'-'.$input['invoiceNumber'].'-invoice.pdf');
+        }
 
 
     }

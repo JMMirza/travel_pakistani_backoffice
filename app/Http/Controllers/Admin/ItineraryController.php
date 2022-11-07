@@ -114,16 +114,15 @@ class ItineraryController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $itinerary_template = ItineraryTemplate::findOrFail($id);
+
         $categories = Category::all();
         $cities = City::all();
 
-        // dd($itinerary_template->with(['templateDetails.city'])->first()->toArray());
-
+        $itinerary_templates = ItineraryTemplate::where('id',$id)->with(['templateDetails.city', 'category'])->first();
         return view(
             'itinerary_templates.edit_itinerary_template',
             [
-                'itinerary_template' => $itinerary_template->with(['templateDetails.city', 'category'])->first(),
+                'itinerary_template' => $itinerary_templates,
                 'categories' => $categories,
                 'cities' => $cities,
                 'tab' => $request->has('tab') ? $request->tab : 1
