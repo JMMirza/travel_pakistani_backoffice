@@ -33,6 +33,7 @@
                     </div> --}}
                     <form class="row g-3 needs-validation" action="{{ route('create-new-operator') }}" method="POST"
                         novalidate>
+                        @csrf
                         {{-- <div class="row"> --}}
 
                         <div class="col-lg-4">

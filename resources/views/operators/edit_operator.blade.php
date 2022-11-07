@@ -85,186 +85,217 @@
                     </div>
                 </div>
                 <div class="card-body p-4">
-                    <form action="javascript:void(0);">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-label-group in-border mb-3">
-                                    <label for="companyTitle" class="form-label">Company Title</label>
-                                    <input type="text"
-                                        class="form-control @if ($errors->has('companyTitle')) is-invalid @endif"
-                                        id="companyTitle" name="companyTitle" placeholder="Please Enter"
-                                        value="{{ $operator->companyTitle }}">
-                                    <div class="invalid-tooltip">
-                                        @if ($errors->has('companyTitle'))
-                                            {{ $errors->first('companyTitle') }}
-                                        @else
-                                            Company Title is required!
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4">
-                                {{-- <label for="cityInput" class="form-label">City</label> --}}
-                                <div class="form-label-group in-border mb-3">
-                                    <label for="cityId" class="form-label">City</label>
-                                    <select
-                                        class="form-select form-control mb-3 @if ($errors->has('cityId')) is-invalid @endif"
-                                        name="cityId">
-                                        <option value="" @if ($operator->user->cityId == '') {{ 'selected' }} @endif
-                                            selected disabled>
-                                            Select One
-                                        </option>
-                                        @foreach ($cities as $city)
-                                            <option value="{{ $city->city_id }}"
-                                                @if ($operator->user->cityId == $city->city_id) {{ 'selected' }} @endif>
-                                                {{ $city->title }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="invalid-tooltip">
-                                        @if ($errors->has('cityId'))
-                                            {{ $errors->first('cityId') }}
-                                        @else
-                                            Select the City!
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-                            <div class="col-lg-4">
-                                <div class="form-label-group in-border mb-3">
-                                    <label for="contactNumber" class="form-label">Phone Number</label>
-                                    <input type="text"
-                                        class="form-control @if ($errors->has('contactNumber')) is-invalid @endif"
-                                        id="contactNumber" name="contactNumber" placeholder="Please Enter"
-                                        value="{{ $operator->contactNumber }}">
-                                    <div class="invalid-tooltip">
-                                        @if ($errors->has('contactNumber'))
-                                            {{ $errors->first('contactNumber') }}
-                                        @else
-                                            Phone Number is required!
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <div class="form-label-group in-border mb-3">
-                                    <label for="businessEmail" class="form-label">Email</label>
-                                    <input type="text"
-                                        class="form-control @if ($errors->has('businessEmail')) is-invalid @endif"
-                                        id="businessEmail" name="businessEmail" placeholder="Please Enter"
-                                        value="{{ $operator->businessEmail }}">
-                                    <div class="invalid-tooltip">
-                                        @if ($errors->has('businessEmail'))
-                                            {{ $errors->first('businessEmail') }}
-                                        @else
-                                            Email is required!
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <div class="form-label-group in-border mb-3">
-                                    <label for="contactPerson" class="form-label">Contact Person</label>
-                                    <input type="text"
-                                        class="form-control @if ($errors->has('contactPerson')) is-invalid @endif"
-                                        id="contactPerson" name="contactPerson" placeholder="Please Enter"
-                                        value="{{ $operator->contactPerson }}">
-                                    <div class="invalid-tooltip">
-                                        @if ($errors->has('contactPerson'))
-                                            {{ $errors->first('contactPerson') }}
-                                        @else
-                                            Contact Person is required!
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6">
-                                {{-- <label for="cityInput" class="form-label">City</label> --}}
-                                <div class="form-label-group in-border mb-3">
-                                    <label for="businessType" class="form-label">Business Type</label>
-                                    <select
-                                        class="form-select form-control mb-3 @if ($errors->has('businessType')) is-invalid @endif"
-                                        name="businessType">
-                                        <option @if ($operator->businessType == '') {{ 'selected' }} @endif
-                                            value="">Select</option>
-                                        <option @if ($operator->businessType == '0') {{ 'selected' }} @endif
-                                            value="0">FIT and Small GROUP Business</option>
-                                        <option @if ($operator->businessType == '1') {{ 'selected' }} @endif
-                                            value="1">Mainly MICE Business</option>
-                                        <option @if ($operator->businessType == '2') {{ 'selected' }} @endif
-                                            value="2">Mainly Group Business</option>
-                                    </select>
-                                    <div class="invalid-tooltip">
-                                        @if ($errors->has('businessType'))
-                                            {{ $errors->first('businessType') }}
-                                        @else
-                                            Select the Business Type!
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6">
-                                {{-- <label for="cityInput" class="form-label">City</label> --}}
-                                <div class="form-label-group in-border mb-3">
-                                    <label for="typeDescription" class="form-label">Description</label>
-                                    <select
-                                        class="form-select form-control mb-3 @if ($errors->has('typeDescription')) is-invalid @endif"
-                                        name="typeDescription">
-                                        <option @if ($operator->typeDescription == '') {{ 'selected' }} @endif
-                                            value="">Select</option>
-                                        <option @if ($operator->typeDescription == '1') {{ 'selected' }} @endif
-                                            value="1">Tour Operator mainly focusing on Inbound</option>
-                                        <option @if ($operator->typeDescription == '2') {{ 'selected' }} @endif
-                                            value="2">Travel Agent mainly focusing on Outbound</option>
-                                    </select>
-                                    <div class="invalid-tooltip">
-                                        @if ($errors->has('businessType'))
-                                            {{ $errors->first('businessType') }}
-                                        @else
-                                            Select the Description!
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-12">
-                                <div class="form-label-group in-border mb-3">
-                                    <label for="companyAddress" class="form-label">Address</label>
-                                    <textarea type="text" class="form-control @if ($errors->has('companyAddress')) is-invalid @endif"
-                                        id="companyAddress" name="companyAddress" placeholder="Please Enter">{{ $operator->companyAddress }}</textarea>
-                                    <div class="invalid-tooltip">
-                                        @if ($errors->has('companyAddress'))
-                                            {{ $errors->first('companyAddress') }}
-                                        @else
-                                            Address is required!
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-12 col-sm-12 mb-3">
-                                <label for="about" class="form-label">About</label>
-                                <div id="snow-editor" style="height: 300px;">{!! $operator->about !!}</div>
-                                <input type="hidden" name="about" id="about" value="{{ $operator->about }}">
-                                {{-- <div class="form-label-group in-border">
-                                    <label for="description" class="form-label">Description (物品描述)</label>
-                                    <textarea class="form-control mb-3" name="description" id="description" placeholder="Enter product description here...">{{ $paymentMethod->description') }}</textarea>
-                                </div> --}}
-                            </div>
-
-                            <div class="col-lg-12">
-                                <div class="hstack gap-2 justify-content-end">
-                                    <button type="submit" class="btn btn-primary">Updates</button>
-                                    <button type="button" class="btn btn-soft-success">Cancel</button>
+                    <form class="row  needs-validation" action="{{ route('landmarks.update', $operator->id) }}"
+                        method="POST" enctype="multipart/form-data" novalidate>
+                        @csrf
+                        @method('PUT')
+                        <div class="col-lg-4">
+                            <div class="form-label-group in-border mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text"
+                                    class="form-control @if ($errors->has('name')) is-invalid @endif" id="name"
+                                    name="name" placeholder="Please Enter" value="{{ $operator->user->name }}">
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('name'))
+                                        {{ $errors->first('name') }}
+                                    @else
+                                        Name is required!
+                                    @endif
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-label-group in-border mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="text"
+                                    class="form-control @if ($errors->has('phone')) is-invalid @endif" id="phone"
+                                    name="phone" placeholder="Please Enter" value="{{ $operator->user->phone }}">
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('phone'))
+                                        {{ $errors->first('phone') }}
+                                    @else
+                                        Phone Number is required!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-label-group in-border mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="text"
+                                    class="form-control @if ($errors->has('email')) is-invalid @endif" id="email"
+                                    name="email" placeholder="Please Enter" value="{{ $operator->user->email }}">
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('email'))
+                                        {{ $errors->first('email') }}
+                                    @else
+                                        Email is required!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-label-group in-border mb-3">
+                                <label for="companyTitle" class="form-label">Company Title</label>
+                                <input type="text"
+                                    class="form-control @if ($errors->has('companyTitle')) is-invalid @endif"
+                                    id="companyTitle" name="companyTitle" placeholder="Please Enter"
+                                    value="{{ $operator->companyTitle }}">
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('companyTitle'))
+                                        {{ $errors->first('companyTitle') }}
+                                    @else
+                                        Company Title is required!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            {{-- <label for"cityInput" class="form-label">City</label> --}}
+                            <div class="form-label-group in-border mb-3">
+                                <label for="cityId" class="form-label">City</label>
+                                <select
+                                    class="form-select form-control mb-3 @if ($errors->has('cityId')) is-invalid @endif"
+                                    name="cityId">
+                                    <option value="" @if ($operator->cityId == '') {{ 'selected' }} @endif
+                                        selected disabled>
+                                        Select One
+                                    </option>
+                                    @foreach ($cities as $city)
+                                        <option value="{{ $city->city_id }}"
+                                            @if ($operator->cityId == $city->city_id) {{ 'selected' }} @endif>
+                                            {{ $city->title }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('cityId'))
+                                        {{ $errors->first('cityId') }}
+                                    @else
+                                        Select the City!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-label-group in-border mb-3">
+                                <label for="contactPerson" class="form-label">Contact Person</label>
+                                <input type="text"
+                                    class="form-control @if ($errors->has('contactPerson')) is-invalid @endif"
+                                    id="contactPerson" name="contactPerson" placeholder="Please Enter"
+                                    value="{{ $operator->contactPerson }}">
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('contactPerson'))
+                                        {{ $errors->first('contactPerson') }}
+                                    @else
+                                        Contact Person is required!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-label-group in-border mb-3">
+                                <label for="businessEmail" class="form-label">Business Email</label>
+                                <input type="text"
+                                    class="form-control @if ($errors->has('businessEmail')) is-invalid @endif"
+                                    id="businessEmail" name="businessEmail" placeholder="Please Enter"
+                                    value="{{ $operator->businessEmail }}">
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('businessEmail'))
+                                        {{ $errors->first('businessEmail') }}
+                                    @else
+                                        Business Email is required!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            {{-- <label for="cityInput" class="form-label">City</label> --}}
+                            <div class="form-label-group in-border mb-3">
+                                <label for="businessType" class="form-label">Business Type</label>
+                                <select
+                                    class="form-select form-control mb-3 @if ($errors->has('businessType')) is-invalid @endif"
+                                    name="businessType">
+                                    <option @if ($operator->businessType == '') {{ 'selected' }} @endif value="">
+                                        Select</option>
+                                    <option @if ($operator->businessType == '0') {{ 'selected' }} @endif value="0">
+                                        FIT and Small GROUP Business</option>
+                                    <option @if ($operator->businessType == '1') {{ 'selected' }} @endif value="1">
+                                        Mainly MICE Business</option>
+                                    <option @if ($operator->businessType == '2') {{ 'selected' }} @endif value="2">
+                                        Mainly Group Business</option>
+                                </select>
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('businessType'))
+                                        {{ $errors->first('businessType') }}
+                                    @else
+                                        Select the Business Type!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            {{-- <label for="cityInput" class="form-label">City</label> --}}
+                            <div class="form-label-group in-border mb-3">
+                                <label for="typeDescription" class="form-label">Description</label>
+                                <select
+                                    class="form-select form-control mb-3 @if ($errors->has('typeDescription')) is-invalid @endif"
+                                    name="typeDescription">
+                                    <option @if ($operator->typeDescription == '') {{ 'selected' }} @endif value="">
+                                        Select</option>
+                                    <option @if ($operator->typeDescription == '1') {{ 'selected' }} @endif value="1">
+                                        Tour Operator mainly focusing on Inbound</option>
+                                    <option @if ($operator->typeDescription == '2') {{ 'selected' }} @endif value="2">
+                                        Travel Agent mainly focusing on Outbound</option>
+                                </select>
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('businessType'))
+                                        {{ $errors->first('businessType') }}
+                                    @else
+                                        Select the Description!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-label-group in-border mb-3">
+                                <label for="companyAddress" class="form-label">Address</label>
+                                <textarea type="text" class="form-control @if ($errors->has('companyAddress')) is-invalid @endif"
+                                    id="companyAddress" name="companyAddress" placeholder="Please Enter">{{ $operator->companyAddress }}</textarea>
+                                <div class="invalid-tooltip">
+                                    @if ($errors->has('companyAddress'))
+                                        {{ $errors->first('companyAddress') }}
+                                    @else
+                                        Address is required!
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 mb-3">
+                            <label for="operatorAbout" class="form-label">About</label>
+                            <div id="snow-editor" style="height: 300px;">{!! $operator->operatorAbout !!}</div>
+                            <input type="hidden" name="operatorAbout" id="operatorAbout"
+                                value="{{ $operator->operatorAbout }}">
+                            {{-- <div class="form-label-group in-border">
+                                    <label for="description" class="form-label">Description (物品描述)</label>
+                                    <textarea class="form-control mb-3" name="description" id="description" placeholder="Enter product description here...">{{ $paymentMethod->description') }}</textarea>
+                                </div> --}}
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="hstack gap-2 justify-content-end">
+                                <button type="submit" class="btn btn-primary">Updates</button>
+                                <button type="button" class="btn btn-soft-success">Cancel</button>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
             </div>
