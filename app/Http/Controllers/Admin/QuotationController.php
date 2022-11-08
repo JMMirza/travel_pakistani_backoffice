@@ -1206,7 +1206,7 @@ class QuotationController extends Controller
     public function createQuotationPDFInvoice(Request $request, $quotation_id)
     {
         $user = Auth::user();
-        $cities = City::all();
+
         $status = QuotationStatus::all();
 
         $quotation = Quotation::where(['id' => $quotation_id])->with([
@@ -1248,7 +1248,10 @@ class QuotationController extends Controller
 
 
         $input['quotation'] = $quotation;
-        $input['cities'] = $cities;
+
+        $cities = City::where('city_id',$quotation->cityId)->first();
+
+        $input['city'] = $cities->title;
         $input['status'] = $status;
         $input['services'] = json_decode($quotation->requiredServices);
         $input['userNotes'] = json_decode($quotation->userNotes);

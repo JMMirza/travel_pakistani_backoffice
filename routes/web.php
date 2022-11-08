@@ -47,7 +47,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resources(['/hotels' => HotelController::class]);
     Route::resources(['/templates' => TermsAndConditionController::class]);
     Route::resources(['/itinerary-templates' => ItineraryController::class]);
-
+    Route::post('/create-new-operator', [OperatorController::class, 'create_new_operator'])->name('create-new-operator');
 
     //Rehman
     Route::get('/create-quotation-invoice-pdf/{id}', [QuotationController::class, 'createQuotationPDFInvoice'])->name('create-quotation-invoice-pdf');

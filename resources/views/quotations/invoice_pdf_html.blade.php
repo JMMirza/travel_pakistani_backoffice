@@ -191,7 +191,7 @@
         <td style="width: 22%; "><p style="font-size: 14px;"><strong>Childern:</strong>{{$quotation['children'] ?? 'N/A'}}</p></td>
     </tr>
     <tr>
-        <td style="width: 22%; "><p style="font-size: 14px;"><strong>City:</strong>{{ $quotation['clientContact'] ?? 'N/A' }}</p></td>
+        <td style="width: 22%; "><p style="font-size: 14px;"><strong>City:</strong>{{ $city ?? 'N/A' }}</p></td>
         <td style="width: 22%; "><p style="font-size: 14px;"><strong>Markup Type:</strong>{{ strtoupper($quotation->markupType) ?? 'N/A' }}</p></td>
         <td style="width: 22%; "><p style="font-size: 14px;"><strong>Preferred Dates:</strong>{{ $quotation->tourFrom->format('M j, Y') ?? 'N/A' }} to {{ $quotation->tourEnd->format('M j, Y') ?? 'N/A' }}</p></td>
 
