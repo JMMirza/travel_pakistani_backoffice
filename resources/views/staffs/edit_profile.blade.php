@@ -14,15 +14,17 @@
                 </div>
                 <div class="card-body">
                     <form class="row g-3 needs-validation" id="projectsDetailsForm" novalidate method="POST"
-                        action="{{ route('staffs.update', $user_info->id) }}">
+                        enctype='multipart/form-data' action="{{ route('staffs.update', $user_info->id) }}">
                         @csrf
                         @method('PATCH')
+                        <input type="hidden" name="user_id" value="{{ $user_info->user->id }}">
                         <div class="col-md-6 col-sm-12">
                             <div class="form-label-group in-border">
                                 <label for="fullName" class="form-label">Full Name <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="fullName" name="fullName"
-                                    placeholder="Please enter " value="{{ old('fullName') }}" required>
+                                    placeholder="Please enter "
+                                    value="{{ isset($user_info) ? $user_info->user->name : old('fullName') }}" required>
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('fullName'))
                                         {{ $errors->first('fullName') }}
@@ -40,7 +42,7 @@
                                 <input type="email"
                                     class="form-control @if ($errors->has('email')) is-invalid @endif "
                                     id="investorEmail" name="email" placeholder="Please enter "
-                                    value="{{ isset($user_info) ? $user_info->email : old('email') }}" required>
+                                    value="{{ isset($user_info) ? $user_info->user->email : old('email') }}" required>
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('email'))
                                         {{ $errors->first('email') }}
@@ -57,7 +59,7 @@
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="username" name="username"
                                     placeholder="Please enter "
-                                    value="{{ isset($user_info) ? $user_info->username : old('username') }}" required>
+                                    value="{{ isset($user_info) ? $user_info->user->username : old('username') }}" required>
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('username'))
                                         {{ $errors->first('username') }}
@@ -73,7 +75,7 @@
                                 <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="phone" name="phone"
                                     placeholder="Please enter "
-                                    value="{{ isset($user_info) ? $user_info->phone : old('phone') }}" required>
+                                    value="{{ isset($user_info) ? $user_info->user->phone : old('phone') }}" required>
                                 <div class="invalid-tooltip">
                                     @if ($errors->has('phone'))
                                         {{ $errors->first('phone') }}
@@ -90,14 +92,14 @@
                                 <select
                                     class="form-select form-control mb-3 @if ($errors->has('reportsTo')) is-invalid @endif"
                                     name="reportsTo">
-                                    <option value="" @if (old('reportsTo') == '') {{ 'selected' }} @endif
+                                    <option value="" @if (isset($user_info) ? $user_info->reportsTo : old('reportsTo') == '') {{ 'selected' }} @endif
                                         selected disabled>
                                         Select One
                                     </option>
-                                    @foreach ($data as $user)
-                                        <option value="{{ $user->id }}"
-                                            @if (old('reportsTo') == $user->id) {{ 'selected' }} @endif>
-                                            {{ $user->user }}
+                                    @foreach ($user->userable->staff as $s)
+                                        <option value="{{ $s->user->id }}"
+                                            @if (isset($user_info) ? $user_info->reportsTo : old('reportsTo') == $s->user->id) {{ 'selected' }} @endif>
+                                            {{ $s->user->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -105,28 +107,36 @@
                                     @if ($errors->has('reportsTo'))
                                         {{ $errors->first('reportsTo') }}
                                     @else
-                                        Select the City!
+                                        Select the User!
                                     @endif
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-6 col-sm-12 mb-3">
+                        <div class="col-md-5 col-sm-12 mb-3">
                             <div class="form-label-group in-border">
-                                <label for="image" class="form-label">Image</label>
+                                <label for="photo" class="form-label">Image</label>
                                 <input type="file"
-                                    class="form-control @if ($errors->has('image')) is-invalid @endif" id="image"
-                                    name="image" placeholder="Please Enter Account Name" value="{{ old('image') }}"
-                                    required>
+                                    class="form-control @if ($errors->has('photo')) is-invalid @endif" id="photo"
+                                    name="photo" placeholder="Please Enter Account Name" value="{{ old('photo') }}">
                                 <div class="invalid-tooltip">
-                                    @if ($errors->has('image'))
-                                        {{ $errors->first('image') }}
+                                    @if ($errors->has('photo'))
+                                        {{ $errors->first('photo') }}
                                     @else
                                         Image is required!
                                     @endif
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-1 col-sm-12">
+                            <a href="javascript:void(0);" class="preview-img"
+                                data-url="{{ isset($user_info) ? $user_info->user->profile_image_url : old('photo') }}"><img
+                                    class="rounded avatar-xs header-profile-user mt-4"
+                                    src="{{ isset($user_info) ? $user_info->user->profile_image_url : old('photo') }}"
+                                    alt="Header Avatar"></a>
+                        </div>
+
                         <div class="col-12 text-end">
                             <button class="btn btn-primary" type="submit">Update Record</button>
                             <a href="{{ route('dashboard') }}"
@@ -148,7 +158,7 @@
                         action="{{ route('staffs.update', $user_info->id) }}">
                         @csrf
                         @method('PATCH')
-                        <input type="hidden" name="user_id" value="{{ $user_info->id }}">
+                        <input type="hidden" name="user_id" value="{{ $user_info->user->id }}">
                         <div class="col-md-6 col-sm-12">
                             <div class="form-label-group in-border">
                                 <label for="investorPassword" class="form-label">New Password <span

@@ -34,7 +34,7 @@
                 <li class="menu-title"><span data-key="t-menu">Menu</span></li>
 
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="" role="button">
+                    <a class="nav-link menu-link" href="{{ route('dashboard') }}" role="button">
                         <i class="ri-home-smile-line"></i> <span data-key="t-dashboards">Dashboard</span>
                     </a>
                 </li>
@@ -49,12 +49,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarRolePermission" data-bs-toggle="collapse" role="button"
-                        aria-expanded="false" aria-controls="sidebarRolePermission">
+                    <a class="nav-link menu-link" href="#sidebarQuotation" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="sidebarQuotation">
                         <i class="ri-dashboard-2-line"></i>
                         <span data-key="t-dashboards">Quotations</span>
                     </a>
-                    <div class="collapse menu-dropdown" id="sidebarRolePermission">
+                    <div class="collapse menu-dropdown" id="sidebarQuotation">
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
                                 <a href="{{ route('quotations') }}" class="nav-link" data-key="t-analytics">

@@ -4,9 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\City;
 use App\Models\ItineraryTemplate;
+use App\Models\ItineraryTemplateDetail;
+use App\Models\QuotationImage;
 use Illuminate\Http\Request;
 use DataTables;
+use Auth;
+use Cloudder;
 use Illuminate\Database\QueryException;
 
 class ItineraryController extends Controller
@@ -20,9 +25,12 @@ class ItineraryController extends Controller
     {
         $user = \Auth::user();
         $categories = Category::all();
+
         if ($request->ajax()) {
 
-            $data = ItineraryTemplate::where('userId', $user->id)->with("category")->latest()->get();
+            // $data = ItineraryTemplate::where('userId', $user->id)->with("category")->latest()->get();
+            $data = ItineraryTemplate::with("category")->latest()->get();
+
             return Datatables::of($data)
                 ->addIndexColumn()
                 // ->addColumn('preferredDate', function ($row) {
@@ -49,9 +57,15 @@ class ItineraryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $categories = Category::all();
+        $cities = City::all();
+        return view('itinerary_templates.add_itinerary_template', [
+            'cities' => $cities,
+            'categories' => $categories,
+            'tab' => $request->has('tab') ? $request->tab : 1
+        ]);
     }
 
     /**
@@ -64,21 +78,21 @@ class ItineraryController extends Controller
     {
         $request->validate([
             "templateType" => "required", "string",
-            "templateTitle" => "required|string|min:6",
-            "totalDays" => "required|integer",
+            "days" => "required|integer",
+            "status" => "required|integer",
             "categoryId" => "required|integer"
         ]);
+
         $userId = Auth::user()->id;
         $input['userId'] = $userId;
-        $input['templateType'] = $request->type;
-        $input['templateTitle'] = $request->title;
+        $input['templateType'] = $request->templateType;
+        $input['templateTitle'] = $request->templateTitle;
         $input['totalDays'] = $request->days;
-        $input['categoryId'] = $request->category;
+        $input['categoryId'] = $request->categoryId;
         $input['status'] = $request->status;
 
-        ItineraryTemplate::create($input);
-        return redirect()->route('itinerary-templates.index')
-            ->with('success', 'Itinerary Template created successfully.');
+        $ItineraryTemplateObj = ItineraryTemplate::create($input);
+        return redirect(route('itinerary-templates.edit', $ItineraryTemplateObj->id) . '?tab=2')->with('success', 'Itinerary Template created successfully.');
     }
 
     /**
@@ -98,11 +112,22 @@ class ItineraryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
-        $itinerary_template = ItineraryTemplate::find($id);
+
         $categories = Category::all();
-        return view('itinerary_templates.itinerary_templates', ['itinerary_template' => $itinerary_template, 'categories' => $categories]);
+        $cities = City::all();
+
+        $itinerary_templates = ItineraryTemplate::where('id',$id)->with(['templateDetails.city', 'category'])->first();
+        return view(
+            'itinerary_templates.edit_itinerary_template',
+            [
+                'itinerary_template' => $itinerary_templates,
+                'categories' => $categories,
+                'cities' => $cities,
+                'tab' => $request->has('tab') ? $request->tab : 1
+            ]
+        );
     }
 
     /**
@@ -112,6 +137,75 @@ class ItineraryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    //Edit ItineraryDetail
+    public function EditItineraryTemplateDetail(Request $request,$id){
+      //dd($id);
+        $itinerary_template_details_obj = ItineraryTemplateDetail::where('id',$id)->first();
+        //dd($itinerary_template_details_obj->templateId);
+        $itinerary_template = ItineraryTemplate::findOrFail($itinerary_template_details_obj->templateId);
+        $categories = Category::all();
+        $cities = City::all();
+
+        // dd($itinerary_template->with(['templateDetails.city'])->first()->toArray());
+
+        return view(
+            'itinerary_templates.edit_itinerary_template',
+            [
+                'itinerary_template' => $itinerary_template->with(['templateDetails.city', 'category'])->first(),
+                'categories' => $categories,
+                'cities' => $cities,
+                'itinerary_template_details_obj' => $itinerary_template_details_obj,
+                'tab' => 2
+            ]
+        );
+}
+    public function saveItineraryDetail(Request $request)
+    {
+        //dd($request->all());
+        $request->validate([
+            "itineraryTemplateId" => "required", "string",
+            "dayNo" => "required|integer",
+            "cityId" => "required|integer",
+            "pickupTime" => "required",
+            "description" => "required",
+            "cityId" => "required|integer"
+        ]);
+        $int_detail['templateId'] = $request->itineraryTemplateId;
+        $int_detail['cityId'] = $request->cityId;
+        $int_detail['dayNo'] = $request->dayNo;
+        $int_detail['pickupTime'] = $request->pickupTime;
+        $int_detail['description'] = $request->description;
+        //update
+        if(!empty($request->itineraryTemplateDetailId)){
+            ItineraryTemplateDetail::where('id', $request->itineraryTemplateDetailId)->update($int_detail);
+            $itineraryID=$request->itineraryTemplateDetailId;
+            $msg = 'Template detail updated successfully.';
+        }else{
+            //create
+            $itinerary_templateObj = ItineraryTemplateDetail::create($int_detail);
+            $itineraryID=$itinerary_templateObj->id;
+            $msg = 'Template detail created successfully.';
+
+        }
+
+        //Photo upload
+        if ($request->hasFile("photo")) {
+
+            $imgOptions = ['folder' => 'TP-DestinationContent', 'format' => 'webp'];
+            $cloudder = Cloudder::upload($request->file("photo")->getRealPath(), null, $imgOptions);
+
+            $imgName = '';
+
+            if ($cloudder) {
+                $result = $cloudder->getResult();
+                $imgName = $result['public_id'];
+            }
+
+            $itinerary_update = ItineraryTemplateDetail::where('id', $itineraryID)->update(['photo' => $imgName]);
+        }
+        return redirect()->back()
+            ->with('success', $msg);
+    }
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -129,8 +223,9 @@ class ItineraryController extends Controller
         $input['categoryId'] = $request->categoryId;
         $input['status'] = $request->status;
 
-        $itinerary_template->update($input);
-        return redirect()->route('templates.index')
+        $itinerary_obj = $itinerary_template->update($input);
+
+        return redirect()->route('itinerary-templates.index')
             ->with('success', 'Template updated successfully.');
     }
 
@@ -142,9 +237,21 @@ class ItineraryController extends Controller
      */
     public function destroy($id)
     {
+
         $template = ItineraryTemplate::findOrFail($id);
         try {
             return $template->delete();
+        } catch (QueryException $e) {
+            print_r($e->errorInfo);
+        }
+    }
+    public function DeleteItineraryTemplateDetail($id)
+    {
+
+        $templateDetail = ItineraryTemplateDetail::findOrFail($id);
+        try {
+             $templateDetail->delete();
+             return redirect()->back()->with('success','Record deleted successfully');
         } catch (QueryException $e) {
             print_r($e->errorInfo);
         }

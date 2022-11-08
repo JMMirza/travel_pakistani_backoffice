@@ -18,7 +18,10 @@ use App\Models\Operator;
 use App\Models\Sector;
 use App\Models\Staff;
 use App\Models\UserType;
-
+use App\Notifications\SendPasswordToNewStaff;
+use Cloudder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\QueryException;
@@ -37,13 +40,15 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
+
+        // $user = User::with('userable.staff.user')->where('id', $user->id)->first();
+        // dd($user->userable->staff->toArray());
+
         if ($request->ajax()) {
-            $data = User::with(['roles', 'permissions'])->whereHas(
-                'roles',
-                function ($q) {
-                    $q->where('name', 'staff');
-                }
-            )->get();
+
+            $user = User::with('userable.staff.user')->where('id', $user->id)->first();
+            $data = $user->userable->staff;
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -53,15 +58,7 @@ class UserController extends Controller
                         <a href="' . route('staff-profile', $row->id) . '" class="btn btn-sm btn-success btn-icon waves-effect waves-light"><i class="mdi mdi-lead-pencil"></i></a>';
                     return $actionBtn;
                 })
-                ->addColumn('roles', function ($row) {
-                    $count = ($row->roles->count());
-                    return $count;
-                })
-                ->addColumn('permissions', function ($row) {
-                    $count = ($row->permissions->count());
-                    return $count;
-                })
-                ->rawColumns(['action', 'roles', 'permissions'])
+                ->rawColumns(['action'])
                 ->make(true);
         }
         return view('staffs.index');
@@ -104,8 +101,8 @@ class UserController extends Controller
 
     public function editUserRolesPermissions(Request $request, $id)
     {
-        // dd(\Auth::user()->roles());
-        if (\Auth::user()->hasRole('admin')) {
+        // dd(Auth::user()->roles());
+        if (Auth::user()->hasRole('admin')) {
             $user = User::query()
                 ->with(['roles:id,name', 'permissions:id,name'])
                 ->findOrFail($id);
@@ -137,7 +134,6 @@ class UserController extends Controller
         }
     }
 
-
     public function updateUserRolesPermissions(Request $request, $id)
     {
         $modelKey = 'users';
@@ -162,29 +158,9 @@ class UserController extends Controller
      */
     public function create()
     {
-        $user = \Auth::user();
-        // return $this->json(["data"=>$user],200);
-        $list = array();
-        /*if($user->userable_type=="Admin")
-        {
-            $list= Staff::where("staffable_type","Admin")->get();
-        }*/
-        if ($user->hasRole("Staff")) {
-            $staff = Staff::find($user->userable_id);
-            $list = Staff::with("user")->where("staffable_type", $staff->staffable_type)->where("staffable_id", $staff->staffable_id)->get();
-        } else {
-            $list = Staff::with("user")->where("staffable_type", $user->userable_type)->where("staffable_id", $user->userable_id)->get();
-        }
-
-        $totalStaff = count($list);
-        $filteredList = array();
-        for ($i = 0; $i < $totalStaff; $i++) {
-            if ($list[$i]->user != NULL && $list[$i]->user->status > 0) {
-                array_push($filteredList, $list[$i]);
-            }
-        }
-        array_push($filteredList, $user);
-        return view('staffs.add_new_profile', ["data" => $filteredList, "user" => $user]);
+        $user = Auth::user();
+        $user = User::with('userable.staff.user')->where('id', $user->id)->first();
+        return view('staffs.add_new_profile', ["user" => $user]);
     }
 
     /**
@@ -198,21 +174,22 @@ class UserController extends Controller
         $request->validate([
             "fullName" => "required|min:5",
             "phone" => "required",
-            "staffAdmin" => "required",
+            "reportsTo" => "required",
             "username" => "required|alpha_dash|unique:users,username,NULL,NULL,deleted_at,NULL|min:5",
             "email" => "required|email|unique:users,email,NULL,NULL,deleted_at,NULL",
         ]);
 
-        $loggedInUser = \Auth::user();
+        $loggedInUser = Auth::user();
 
         $staff = new Staff();
-        if ($loggedInUser->userable_type == "Operator") {
+
+        if ($loggedInUser->userable_type == "App\Models\Operator") {
             $staffable = Operator::find($loggedInUser->userable_id);
         } else {
             $staffable = User::find($loggedInUser->id);
         }
-        $staff->reportsTo = $request->staffAdmin;
 
+        $staff->reportsTo = $request->reportsTo;
         $staffable->staff()->save($staff);
 
         $user = new User();
@@ -220,14 +197,16 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->username = strtolower($request->username);
         $user->cityId = $loggedInUser->cityId;
-        $user->branchId = $loggedInUser->branchId;
+        $user->branchId = 1;
         $user->phone = $request->phone;
         $user->status = 1;
         $randString = Str::random(10);
         $user->passwordText = $randString;
         $user->password = Hash::make($randString);
-        //$user->credits=env("OPERATOR_CREDITS_FREE");
+        $user->credits = env("OPERATOR_CREDITS_FREE", '100');
+
         if ($request->hasFile("photo")) {
+            // dd($request->all());
             $imgOptions = ['folder' => 'guide_profile', 'format' => 'webp'];
             $cloudder = Cloudder::upload($request->file('photo')->getRealPath(), null, $imgOptions);
             $result = $cloudder->getResult();
@@ -235,24 +214,17 @@ class UserController extends Controller
                 $user->profilePic = $result["public_id"];
             }
         }
+
         $staff->user()->save($user);
 
-        $user->assignRole("Staff");
+        $user->attachRole("staff");
 
-        $userInfo["fullName"] = $user->name;
-        $userInfo["userName"] = $user->username;
-        $userInfo["email"] = $user->email;
-        $userInfo["password"] = $randString;
+        $data = [
+            'email' => $user->email,
+            'password' => $user->passwordText,
+        ];
+        $user->notify(new SendPasswordToNewStaff($data));
 
-        // Mail::to($user->email)->send(new StaffAccountEmail($userInfo));
-        $input = $request->all();
-
-        if ($request->password) {
-            $input['password'] = bcrypt($request->password);
-        }
-
-        $user = User::create($input);
-        $user->attachRole('staff');
         return redirect(route('staffs.index'))->with('success', 'Staff created successfully');
     }
 
@@ -276,36 +248,14 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $user_info = User::where('id', $id)->first();
-        // $user_info = $id;
-
-        $user = \Auth::user();
-        // return $this->json(["data"=>$user],200);
-        $list = array();
-        /*if($user->userable_type=="Admin")
-        {
-            $list= Staff::where("staffable_type","Admin")->get();
-        }*/
-        if ($user->hasRole("Staff")) {
-            $staff = Staff::find($user->userable_id);
-            $list = Staff::with("user")->where("staffable_type", $staff->staffable_type)->where("staffable_id", $staff->staffable_id)->get();
-        } else {
-            $list = Staff::with("user")->where("staffable_type", $user->userable_type)->where("staffable_id", $user->userable_id)->get();
-        }
-
-        $totalStaff = count($list);
-        $filteredList = array();
-        for ($i = 0; $i < $totalStaff; $i++) {
-            if ($list[$i]->user != NULL && $list[$i]->user->status > 0) {
-                array_push($filteredList, $list[$i]);
-            }
-        }
-        array_push($filteredList, $user);
-
+        $user = Auth::user();
+        $user_info = Staff::with(['user', 'reportsToUser'])->where('id', $id)->first();
+        $users = User::with('userable.staff.user')->where('id', $user->id)->first();
+        // dd($user_info->toArray());
         $data = [
             'user_info' => $user_info,
+            'user' => $users,
         ];
-
 
         return view('staffs.edit_profile', $data);
     }
@@ -320,24 +270,44 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $logged_user = User::findorfail($request->user_id);
+        $loggedInUser = Auth::user();
         // dd($logged_user->toArray());
         if ($request->password) {
             $request->validate([
                 'password' => 'required | min:8 | confirmed',
             ]);
-            $password = bcrypt($request->password);
-            $logged_user->password = $password;
+            $logged_user->passwordText = $request->password;
+            $logged_user->password = Hash::make($request->password);
             $logged_user->save();
         } else {
             $request->validate([
-                'name' => 'required',
-                'email' => 'required | email | unique:users,email,' . $logged_user->id,
+                "fullName" => "required|min:5",
+                "phone" => "required",
+                "reportsTo" => "required",
+                "username" => "required|alpha_dash|min:5|unique:users,username,NULL,NULL,deleted_at,NULL" . $logged_user->id,
+                "email" => "required|email|unique:users,email,NULL,NULL,deleted_at,NULL" . $logged_user->id,
             ]);
 
-            $input = $request->all();
-            $logged_user->update($input);
+            $logged_user->name = $request->fullName;
+            $logged_user->email = $request->email;
+            $logged_user->username = strtolower($request->username);
+            $logged_user->cityId = $loggedInUser->cityId;
+            $logged_user->branchId = $loggedInUser->branchId;
+            $logged_user->phone = $request->phone;
+            $logged_user->status = 1;
+            $logged_user->save();
         }
-        return redirect(route('dashboard'))->with('success', 'Staff updated successfully');
+        if ($request->hasFile("photo")) {
+            // dd($request->all());
+            $imgOptions = ['folder' => 'guide_profile', 'format' => 'webp'];
+            $cloudder = Cloudder::upload($request->file('photo')->getRealPath(), null, $imgOptions);
+            $result = $cloudder->getResult();
+            if (isset($result["public_id"])) {
+                $logged_user->profilePic = $result["public_id"];
+                $logged_user->save();
+            }
+        }
+        return redirect()->route('staffs.index')->with('success', 'Staff updated successfully');
     }
 
     public function uploadCropImage(Request $request)

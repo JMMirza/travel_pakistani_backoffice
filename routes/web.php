@@ -47,6 +47,19 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resources(['/hotels' => HotelController::class]);
     Route::resources(['/templates' => TermsAndConditionController::class]);
     Route::resources(['/itinerary-templates' => ItineraryController::class]);
+    Route::post('/create-new-operator', [OperatorController::class, 'create_new_operator'])->name('create-new-operator');
+
+    //Rehman
+    Route::get('/create-quotation-invoice-pdf/{id}', [QuotationController::class, 'createQuotationPDFInvoice'])->name('create-quotation-invoice-pdf');
+    Route::get('/create-quotation-template-modal', [InquiryController::class, 'createQuotationTemplateModal'])->name('create-quotation-template-modal');
+    Route::get('/list-quotation-templates', [InquiryController::class, 'listQuotationTemplates'])->name('list-quotation-templates');
+    Route::get('/create-template-quotation/{id}', [QuotationController::class, 'createQuotationFromTemplate'])->name('create-template-quotation');
+
+    Route::post('save-itinerary-detail', [ItineraryController::class, 'saveItineraryDetail'])->name('save-itinerary-detail');
+    Route::get('/edit-itinerary-templates-detail/{id}', [ItineraryController::class, 'EditItineraryTemplateDetail'])->name('edit-itinerary-templates-detail');
+    Route::get('/delete-itinerary-templates-detail/{id}', [ItineraryController::class, 'DeleteItineraryTemplateDetail'])->name('delete-itinerary-templates-detail');
+
+    //Rehman
     Route::get('profile', [CommonController::class, 'profile'])->name('profile');
     Route::post('/update-profile/{id}', [UserController::class, 'update_user_profile'])->name('update-profile');
     Route::get('/open-bank-modal', [UserController::class, 'open_bank_modal'])->name('open-bank-modal');
@@ -90,6 +103,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/save-quotation-activity', [QuotationController::class, 'saveQuotationActivity'])->name('save-quotation-activity');
     Route::post('/save-quotation-policy', [QuotationController::class, 'saveQuotationPolicy'])->name('save-quotation-policy');
     Route::post('/save-quotation', [QuotationController::class, 'saveQuotation'])->name('save-quotation');
+    Route::post('/save-quotation-invoice', [QuotationController::class, 'saveQuotationInvoice'])->name('save-quotation-invoice');
 
     Route::post('/save-quotation-service-types', [QuotationController::class, 'saveQuotationServiceTypes'])->name('save-quotation-service-types');
     Route::post('/save-quotation-notes', [QuotationController::class, 'saveQuotationNotesTypes'])->name('save-quotation-notes');
@@ -101,6 +115,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/remove-quotation-service/{id}', [QuotationController::class, 'deleteQuotationService'])->name('remove-quotation-service');
     Route::delete('/remove-quotation-note/{id}', [QuotationController::class, 'deleteQuotationNote'])->name('remove-quotation-note');
     Route::delete('/remove-quotation-image/{id}', [QuotationController::class, 'deleteQuotationImage'])->name('remove-quotation-image');
+
+
+    Route::post('/change-quotation-status', [QuotationController::class, 'changeQuotationStatus'])->name('change-quotation-status');
+
+
+
+
 
 
     Route::get('/existing/update/quotations', [QuotationController::class, 'updateLiveQuotationLink']);
@@ -144,6 +165,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/quotations-responses', [QuotationController::class, 'showResponses'])->name('quotations-responses');
     Route::get('/quotations-response-details/{id}', [QuotationController::class, 'getQuotationResponseDetails'])->name('quotations-response-details');
     Route::get('/quotations-chat/{id}', [QuotationController::class, 'getQuotationChat'])->name('quotations-chat');
+    Route::post('/quotations-send-chat', [QuotationController::class, 'submitQuotationChat'])->name('quotations-send-chat');
     //Quotation routes ends
 
 

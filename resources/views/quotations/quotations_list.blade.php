@@ -10,7 +10,7 @@
                     <h5 class="card-title mb-0 flex-grow-1">Quotations</h5>
                     <div class="flex-shrink-0">
                         <a href="{{ route('quotation-save', ['tab' => 1]) }}" class="btn btn-success btn-label btn-sm">
-                            <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Add Quotation
+                            <i class="ri-add-fill label-icon align-middle fs-16 me-2"></i> Create Quotation
                         </a>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                             <th>Assigned To</th>
                             <th>Version</th>
                             <th>Inquire Date</th>
-                            <th>Created At</th>
+                            <!-- <th>Created At</th> -->
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -127,10 +127,6 @@
                     name: 'created_at'
                 },
                 {
-                    data: 'created_at',
-                    name: 'created_at'
-                },
-                {
                     data: 'status',
                     name: 'status'
                 },
@@ -158,6 +154,41 @@
         if (value.length > 0 || value.length == 0) {
             $('#quotations-table').DataTable().ajax.reload(null, false);
         }
+    });
+
+    $(document).on("change", '.quotation-status', function() {
+
+        var quotationId = $(this).data('quotation-id');
+        var statusId = $(this).val();
+
+        console.log(quotationId, statusId);
+
+        $.ajax({
+
+            url: "{{ route('change-quotation-status') }}",
+            type: "POST",
+            data: {
+                quotationId,
+                statusId,
+            },
+            headers: {
+                'X-CSRF-Token': '{{ csrf_token() }}',
+            },
+            cache: false,
+            success: function(data) {
+                console.log(data);
+                showToast('Status updated successfully!', 'success');
+            },
+            error: function() {
+
+            },
+            beforeSend: function() {
+
+            },
+            complete: function() {
+
+            }
+        });
     });
 </script>
 @endpush
