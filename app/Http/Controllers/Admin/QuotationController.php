@@ -35,7 +35,7 @@ use Illuminate\Support\Facades\View;
 use Storage;
 // use App\Mail\QuotationGenerated;
 // use App\Mail\InvoiceGenerated;
- use PDF;
+use PDF;
 // use Auth;
 use Illuminate\Support\Facades\Mail;
 use Cloudder;
@@ -1229,7 +1229,7 @@ class QuotationController extends Controller
 
         $quotationAmounts = $quotation->getQuotationAmounts();
 
-         //dd($quotationAmounts);
+        //dd($quotationAmounts);
 
         $quotationParent = !empty($quotation->quotationParent) ? $quotation->quotationParent : $quotation->id;
         $versions = Quotation::select('id', 'versionNo')->where(['quotationParent' => $quotationParent])->get();
@@ -1242,10 +1242,7 @@ class QuotationController extends Controller
         }
 
         //$quotation = Quotation::findOrFail($quotation_id);
-        $quotationInvoice = QuotationInvoice::where('quotationId',$quotation_id)->first();
-
-
-
+        $quotationInvoice = QuotationInvoice::where('quotationId', $quotation_id)->first();
 
         $input['quotation'] = $quotation;
         $input['cities'] = $cities;
@@ -1264,18 +1261,17 @@ class QuotationController extends Controller
         $input['quotationInvoice']  = $quotationInvoice;
         $input['invoiceNumber']  = 'TP' . ((int)$quotation_id);
         $pdf = PDF::loadView('quotations.invoice_pdf_html', $input);
-        $pdfInvoiceSave=\Storage::disk('public')->put('quotations/invoices/pdf/quotation_invoice_'.$quotation_id.'.pdf', $pdf->output(), 'public');
+        $pdfInvoiceSave = \Storage::disk('public')->put('quotations/invoices/pdf/quotation_invoice_' . $quotation_id . '.pdf', $pdf->output(), 'public');
         //Download Invoice
-        if(isset($request->download)){
-            return $pdf->download($quotation_id.'-'.$input['invoiceNumber'].'-invoice.pdf');
+        if (isset($request->download)) {
+            return $pdf->download($quotation_id . '-' . $input['invoiceNumber'] . '-invoice.pdf');
         }
         //Open invoice
-        if(isset($request->print)){
-            return $pdf->stream($quotation_id.'-'.$input['invoiceNumber'].'-invoice.pdf');
+        if (isset($request->print)) {
+            return $pdf->stream($quotation_id . '-' . $input['invoiceNumber'] . '-invoice.pdf');
         }
-
-
     }
+
     public function saveQuotationInvoice(Request $request)
     {
         $validator = \Validator::make($request->all(), [
