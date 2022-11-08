@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Operator;
 use App\Models\User;
+use App\Notifications\SendPasswordToNewStaff;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use DataTables;
@@ -46,7 +48,8 @@ class OperatorController extends Controller
      */
     public function create()
     {
-        //
+        $cities = City::all();
+        return view('operators.create_new_operator', ['cities' => $cities]);
     }
 
     /**
@@ -110,6 +113,7 @@ class OperatorController extends Controller
     public function show($id)
     {
         $operator = Operator::with(["user", "user.city"])->find($id);
+        // dd($operator->toArray());
         $cities = City::all();
         return view('operators.edit_operator', ['operator' => $operator, 'cities' => $cities]);
     }
@@ -215,5 +219,61 @@ class OperatorController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function create_new_operator(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            "cityId" => "required",
+            "username" => "required|min:6|max:254|unique:users,username|alpha_dash",
+            //"branchId"=>"required|integer|exists:branches,id",
+            "companyTitle" => "required|string|unique:operators,companyTitle|max:254",
+            "contactPerson" => "required|string|min:8",
+            "businessEmail" => "required|email|unique:operators,businessEmail",
+            "contactNumber" => "required",
+            "companyAddress" => "required|string|min:8",
+            // "operatorLogo"=>"required|image",
+            "operatorAbout" => "required",
+            "businessType" => "required",
+            "typeDescription" => "required"
+        ]);
+
+        $operator = Operator::create([
+            'companyTitle' => $request->companyTitle,
+            'contactPerson' => $request->contactPerson,
+            'businessEmail' => $request->businessEmail,
+            'contactNumber' => $request->contactNumber,
+            'companyAddress' => $request->companyAddress,
+            'operatorLogo' => "",
+            'operatorAbout' => $request->operatorAbout,
+            'businessType' => $request->businessType,
+            'typeDescription' => $request->typeDescription,
+            'status' => 0,
+        ]);
+
+        $randString = Str::random(10);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'username' => strtolower($request->username),
+            'cityId' => $request->cityId,
+            'branchId' => 1,
+            'passwordText' => $randString,
+            'password' => Hash::make($randString),
+            'credits' => env("OPERATOR_CREDITS_FREE", '100')
+        ]);
+        $data = [
+            'email' => $user->email,
+            'password' => $user->passwordText,
+        ];
+        $user->notify(new SendPasswordToNewStaff($data));
+        $operator->user()->save($user);
+        $user->attachRole('operator');
+        return redirect()->route('operator.index')
+            ->with('success', 'Operator Created');
     }
 }

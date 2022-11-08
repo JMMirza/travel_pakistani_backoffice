@@ -1206,7 +1206,7 @@ class QuotationController extends Controller
     public function createQuotationPDFInvoice(Request $request, $quotation_id)
     {
         $user = Auth::user();
-        $cities = City::all();
+
         $status = QuotationStatus::all();
 
         $quotation = Quotation::where(['id' => $quotation_id])->with([
@@ -1245,7 +1245,10 @@ class QuotationController extends Controller
         $quotationInvoice = QuotationInvoice::where('quotationId', $quotation_id)->first();
 
         $input['quotation'] = $quotation;
-        $input['cities'] = $cities;
+
+        $cities = City::where('city_id', $quotation->cityId)->first();
+
+        $input['city'] = $cities->title;
         $input['status'] = $status;
         $input['services'] = json_decode($quotation->requiredServices);
         $input['userNotes'] = json_decode($quotation->userNotes);
@@ -1255,17 +1258,18 @@ class QuotationController extends Controller
         $input['totalPaid'] =   $quotationAmounts['totalPaid'];
         $input['totalRemaining'] =  $quotationAmounts['totalRemaining'];
 
-
         //dd($quotation->quotationInvoices);
         $input['totalAmount'] = $quotationAmounts['totalRemaining'];
         $input['quotationInvoice']  = $quotationInvoice;
         $input['invoiceNumber']  = 'TP' . ((int)$quotation_id);
         $pdf = PDF::loadView('quotations.invoice_pdf_html', $input);
+
         $pdfInvoiceSave = \Storage::disk('public')->put('quotations/invoices/pdf/quotation_invoice_' . $quotation_id . '.pdf', $pdf->output(), 'public');
         //Download Invoice
         if (isset($request->download)) {
             return $pdf->download($quotation_id . '-' . $input['invoiceNumber'] . '-invoice.pdf');
         }
+
         //Open invoice
         if (isset($request->print)) {
             return $pdf->stream($quotation_id . '-' . $input['invoiceNumber'] . '-invoice.pdf');
