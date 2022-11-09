@@ -30,7 +30,6 @@
                 <thead class="table-light">
                     <tr>
                         <th>Sr#</th>
-                        <th>Due Date</th>
                         <th>Paid Date</th>
                         <th>Total Amount</th>
                         <th>Due Amount</th>
